@@ -44,4 +44,4 @@ export const argSchemas = {
 export type ArgsOf<K extends keyof typeof argSchemas> = z.infer<(typeof argSchemas)[K]>;
 
 export const isKnownToolName = (name: string): name is keyof typeof argSchemas =>
-	name in argSchemas;
+	Object.hasOwn(argSchemas, name);

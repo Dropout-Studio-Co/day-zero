@@ -17,6 +17,7 @@
 	import CountdownCalendar from "$src/components/CountdownCalendar.svelte";
 	import { Input, Cta, cn, inputBase, labelBase } from "$lib/ds";
 	import { formatTargetDate } from "$lib/countdown/format";
+	import { buildTargetIso, parseTargetIso } from "$lib/countdown/time";
 	import { lockScroll } from "$lib/hooks";
 	import { CalendarDate, getLocalTimeZone, today, type DateValue } from "@internationalized/date";
 	import type { Countdown, CountdownInput } from "$lib/types";
@@ -48,13 +49,6 @@
 	const hours = Array.from({ length: 12 }, (_, i) => String(i === 0 ? 12 : i));
 	const minutes = Array.from({ length: 60 }, (_, i) => pad(i));
 
-	const to24 = (h12: number, mer: "AM" | "PM") =>
-		mer === "AM" ? (h12 === 12 ? 0 : h12) : h12 === 12 ? 12 : h12 + 12;
-	const from24 = (h24: number): { h12: string; mer: "AM" | "PM" } => ({
-		h12: String(h24 % 12 === 0 ? 12 : h24 % 12),
-		mer: h24 < 12 ? "AM" : "PM"
-	});
-
 	// New countdowns can't target a past day; an existing goal may already be past,
 	// so editing leaves the calendar unconstrained.
 	const minDate = $derived(editing ? undefined : today(getLocalTimeZone()));
@@ -63,21 +57,15 @@
 	// reused for the live summary line so the user sees exactly what lands.
 	const resolvedIso = $derived.by(() => {
 		if (!dateValue) return null;
-		// Timed goals are a real instant (build in local time). Date-only goals are
-		// anchored to UTC midnight so the picked calendar day is zone-stable and renders
-		// identically on SSR + every viewer zone (see format.ts dateOnlyFmt).
-		const ts = withTime
-			? new Date(
-					dateValue.year,
-					dateValue.month - 1,
-					dateValue.day,
-					to24(Number(hour12), meridiem),
-					Number(minStr),
-					0,
-					0
-				)
-			: new Date(Date.UTC(dateValue.year, dateValue.month - 1, dateValue.day));
-		return Number.isNaN(ts.getTime()) ? null : ts.toISOString();
+		return buildTargetIso({
+			year: dateValue.year,
+			month: dateValue.month,
+			day: dateValue.day,
+			hour12: Number(hour12),
+			minute: Number(minStr),
+			meridiem,
+			hasTime: withTime
+		});
 	});
 	const summary = $derived(resolvedIso ? formatTargetDate(resolvedIso, withTime) : null);
 
@@ -85,19 +73,22 @@
 	$effect(() => {
 		if (open && !wasOpen) {
 			if (editing) {
-				const d = new Date(editing.targetAt);
+				const parts = parseTargetIso(editing.targetAt, editing.hasTime);
 				title = editing.title;
 				// Date-only goals are stored at UTC midnight, so recover the picked day in
 				// UTC; timed goals are a local instant, so read local components.
-				dateValue = editing.hasTime
-					? new CalendarDate(d.getFullYear(), d.getMonth() + 1, d.getDate())
-					: new CalendarDate(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
-				placeholder = dateValue;
-				withTime = editing.hasTime;
-				const { h12, mer } = from24(d.getHours());
-				hour12 = h12;
-				meridiem = mer;
-				minStr = pad(d.getMinutes());
+				if (parts) {
+					dateValue = new CalendarDate(parts.year, parts.month, parts.day);
+					placeholder = dateValue;
+					withTime = editing.hasTime;
+					hour12 = parts.hour12;
+					meridiem = parts.meridiem;
+					minStr = parts.minute;
+				} else {
+					placeholder = today(getLocalTimeZone());
+					dateValue = undefined;
+					withTime = editing.hasTime;
+				}
 			} else {
 				title = "";
 				dateValue = undefined;

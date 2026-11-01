@@ -34,6 +34,8 @@ bun run preview           # build + wrangler dev (full Workers preview)
 bun run check             # svelte-check (strict TS) — must be 0 errors/0 warnings
 bun run lint              # eslint
 bun run format            # prettier --write
+bun run test              # vitest unit tests (pure logic only: no DOM, network, or D1)
+bun run test:watch        # vitest in watch mode
 bun run sync-ds           # re-vendor @dropout/ds from ../../dropout-design-system (rsync --delete)
 bun run db:generate       # generate Drizzle migration from schema
 bun run db:migrate        # apply migrations to REMOTE D1 (production)
@@ -100,6 +102,7 @@ Gated by `AI_COPILOT_ENABLED` (set `"false"` to disable) **and signed-in only**.
 - **Icons via `@lucide/svelte`** — import named icon components (e.g. `Fingerprint`, `ArrowLeft`); scoped package, not `lucide-svelte`. No inline SVGs.
 - **`E2E_BYPASS_AUTH`** — `=true` in `.dev.vars` (gitignored; never `wrangler.jsonc`/prod) skips Google OAuth by synthesizing a session, upserting an `e2e-test-user` row on **every** request. **Double-gated**: the flag **and** a localhost request host (see the "Test auth & mock data" section). So an **unmigrated local D1 → 500 on every route**; run `bun run db:migrate:local` first.
 - **Before every commit**: `bun run check` (0 errors/0 warnings) + `bun run lint` must pass.
+- **Tests**: `bun run test` runs `src/**/*.test.ts` (pure logic only — no DOM, network, D1, or browser). The vendored DS contract scripts (`src/lib/ds/*.test.js`) are plain `node --test` files and are intentionally outside the vitest glob; run them with `node --test src/lib/ds/*.test.js`. CI (`.github/workflows/ci.yml`) runs secrets/audit/lint, types/tests, and build as three parallel jobs; deploy stays with Workers Builds.
 
 ---
 
