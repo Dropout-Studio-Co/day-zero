@@ -4,7 +4,7 @@
 
 A goal/milestone **countdown tracker**. Sign in with Google, create a countdown toward a target date for something you want to achieve, make as many as you like, and see them all at once on one clean board — the soonest goal promoted to a hero, the rest in a responsive grid, reached goals in a quieter section below. Share any countdown with a read-only public link. An AI copilot manages countdowns through natural-language commands. **No ads.**
 
-**Live**: https://day-zero.beyourahi.workers.dev
+**Live**: https://day-zero.dropoutstudio.co
 
 Part of the Dropout Studio tools, alongside [Order Processor](https://github.com/Dropout-Studio-Co/order-processor) and [Invoice Generator](https://github.com/Dropout-Studio-Co/invoice-generator) — same stack, same Dropout Design System.
 
@@ -122,7 +122,7 @@ wrangler deploy
 2. Create an OAuth 2.0 Client ID (Web application)
 3. Add authorized redirect URIs:
    - `http://localhost:5173/api/auth/callback/google` (local)
-   - `https://day-zero.beyourahi.workers.dev/api/auth/callback/google` (production)
+   - `https://day-zero.dropoutstudio.co/api/auth/callback/google` (production)
 
 ---
 
