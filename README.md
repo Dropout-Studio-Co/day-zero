@@ -6,7 +6,7 @@ A goal/milestone **countdown tracker**. Sign in with Google, create a countdown 
 
 **Live**: https://day-zero.beyourahi.workers.dev
 
-Part of the Dropout Studio tools, alongside [Order Processor](https://github.com/beyourahi/order-processor) and [Invoice Generator](https://github.com/beyourahi/invoice-generator) — same stack, same Dropout Design System.
+Part of the Dropout Studio tools, alongside [Order Processor](https://github.com/Dropout-Studio-Co/order-processor) and [Invoice Generator](https://github.com/Dropout-Studio-Co/invoice-generator) — same stack, same Dropout Design System.
 
 ---
 
@@ -33,7 +33,7 @@ Part of the Dropout Studio tools, alongside [Order Processor](https://github.com
 **Prerequisites**: Bun, a Cloudflare account with a D1 database named `day_zero`, a Google Cloud OAuth 2.0 client.
 
 ```bash
-git clone https://github.com/beyourahi/day-zero.git
+git clone https://github.com/Dropout-Studio-Co/day-zero.git
 cd day-zero
 bun install
 ```
