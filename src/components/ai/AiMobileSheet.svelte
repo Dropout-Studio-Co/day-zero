@@ -63,7 +63,7 @@
 	<div class="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="AI chat">
 		<button
 			type="button"
-			class="bg-scrim absolute inset-0 touch-manipulation cursor-default backdrop-blur-[var(--glass-blur-soft)]"
+			class="bg-scrim absolute inset-0 cursor-default touch-manipulation backdrop-blur-[var(--glass-blur-soft)]"
 			aria-label="Close chat"
 			onclick={close}
 			transition:fade={{ duration: 200 }}
