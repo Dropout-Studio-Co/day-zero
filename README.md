@@ -1,36 +1,26 @@
 # Day Zero
 
-> Counts down every goal on one shareable, ordered board.
+Track all your goals on one simple board that counts down to each date and is easy to share.
 
-A goal/milestone **countdown tracker**. Sign in with Google, create a countdown toward a target date for something you want to achieve, make as many as you like, and see them all at once on one clean board — the soonest goal promoted to a hero, the rest in a responsive grid, reached goals in a quieter section below. Share any countdown with a read-only public link. An AI copilot manages countdowns through natural-language commands. **No ads.**
+## What it is
 
-**Live**: https://day-zero.dropoutstudio.co
+Day Zero is a countdown tracker for goals and milestones. Each countdown points at a date, with an optional time of day, and shows the time left. You can use the board without an account; signing in saves it to the server and unlocks sharing and the AI copilot.
 
-Part of the Dropout Studio tools, alongside [Order Processor](https://github.com/Dropout-Studio-Co/order-processor) and [Invoice Generator](https://github.com/Dropout-Studio-Co/invoice-generator) — same stack, same Dropout Design System.
+## What you can do
 
----
+- Create a countdown for any goal with a date and an optional time of day.
+- See the soonest goal as a large hero countdown, the rest in a grid, and reached dates in their own section below.
+- Use the board as a guest (saved in your browser) or sign in with Google or a passkey to sync it across devices.
+- Share a countdown as a read-only public link with a full-screen view.
+- Ask the AI copilot to add, edit, reorder, or delete countdowns in plain English.
 
-## Tech Stack
+## Requirements
 
-| Layer              | Technology                                       |
-| ------------------ | ------------------------------------------------ |
-| Framework          | SvelteKit 2 + Svelte 5 (runes)                   |
-| Language           | TypeScript (strict)                              |
-| Styling            | Tailwind CSS v4                                  |
-| UI / Design System | Dropout Design System (vendored) + shadcn-svelte |
-| Auth               | Better Auth (Google OAuth)                       |
-| Database           | Cloudflare D1 + Drizzle ORM                      |
-| AI Copilot         | Cloudflare Workers AI                            |
-| Motion             | GSAP                                             |
-| Dates              | @internationalized/date                          |
-| Deployment         | Cloudflare Workers                               |
-| Package manager    | Bun                                              |
-
----
+- Bun 1.2 or newer and Node.js 20.19+ or 22.12+.
+- A Google OAuth 2.0 client for sign-in (you can skip it locally with `E2E_BYPASS_AUTH=true`).
+- A Cloudflare account with a D1 database named `day_zero` to deploy.
 
 ## Setup
-
-**Prerequisites**: Bun, a Cloudflare account with a D1 database named `day_zero`, a Google Cloud OAuth 2.0 client.
 
 ```bash
 git clone https://github.com/Dropout-Studio-Co/day-zero.git
@@ -38,102 +28,59 @@ cd day-zero
 bun install
 ```
 
-Create `.dev.vars` at the project root (Worker runtime secrets, read by the dev server):
+Create a `.dev.vars` file in the project root and fill in your values:
 
 ```dotenv
-BETTER_AUTH_SECRET=      # openssl rand -base64 32
+BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:5173
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-E2E_BYPASS_AUTH=true     # optional — skip Google sign-in during local dev
+TOKEN_ENCRYPTION_KEY=
 ```
 
-Apply migrations and start:
+Generate `BETTER_AUTH_SECRET` and `TOKEN_ENCRYPTION_KEY` with `openssl rand -base64 32`. Apply the database migrations:
 
 ```bash
 bun run db:migrate:local
-bun run dev              # http://localhost:5173
 ```
 
-`vite dev` binds the local D1 database and reads `.dev.vars` through the Cloudflare platform proxy, so Google sign-in works at `http://localhost:5173`. Set `E2E_BYPASS_AUTH=true` to skip OAuth entirely during local development.
-
----
-
-## Environment Variables
-
-Two gitignored files at the project root, each read by a different tool. Never commit either.
-
-`.dev.vars` — Worker runtime secrets, loaded by the dev server and Wrangler:
-
-| Variable               | Description                                    |
-| ---------------------- | ---------------------------------------------- |
-| `BETTER_AUTH_SECRET`   | Random secret for session signing              |
-| `BETTER_AUTH_URL`      | App base URL — `http://localhost:5173` locally |
-| `GOOGLE_CLIENT_ID`     | Google OAuth client ID                         |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret                     |
-| `E2E_BYPASS_AUTH`      | Optional — `true` skips Google sign-in locally |
-
-`.env` — Cloudflare credentials for the Drizzle CLI, used only by the remote `db:*` commands (loaded by Bun):
-
-| Variable                 | Description                                  |
-| ------------------------ | -------------------------------------------- |
-| `CLOUDFLARE_ACCOUNT_ID`  | Cloudflare account ID                        |
-| `CLOUDFLARE_DATABASE_ID` | D1 database ID                               |
-| `CLOUDFLARE_D1_TOKEN`    | Cloudflare API token with D1 edit permission |
-
-In production, set the `.dev.vars` values as Worker secrets via `wrangler secret put`; `BETTER_AUTH_URL` is a non-secret binding in `wrangler.jsonc`.
-
----
-
-## Scripts
-
-| Script                     | Description                            |
-| -------------------------- | -------------------------------------- |
-| `bun run dev`              | Dev server on `:5173`                  |
-| `bun run preview`          | Wrangler local preview on `:8787`      |
-| `bun run build`            | Production build                       |
-| `bun run check`            | Type & Svelte checking (svelte-check)  |
-| `bun run lint`             | ESLint                                 |
-| `bun run format`           | Prettier auto-format                   |
-| `bun run cf-typegen`       | Regenerate Cloudflare types            |
-| `bun run db:generate`      | Generate migration from schema changes |
-| `bun run db:migrate`       | Apply migrations to production D1      |
-| `bun run db:migrate:local` | Apply migrations to local D1           |
-
----
-
-## Deployment
-
-Set production secrets, then build and deploy:
+## Run
 
 ```bash
-wrangler secret put BETTER_AUTH_SECRET
-wrangler secret put GOOGLE_CLIENT_ID
-wrangler secret put GOOGLE_CLIENT_SECRET
-bun run build
-wrangler deploy
+bun run dev       # http://localhost:5173
+bun run preview   # production build, then Workers preview at http://localhost:8787
 ```
 
----
+To skip Google sign-in locally, set `E2E_BYPASS_AUTH=true` in `.dev.vars`. Run `bun run seed` once to load sample countdowns for the local test user.
 
-## Google OAuth Setup
+## Configuration
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials
-2. Create an OAuth 2.0 Client ID (Web application)
-3. Add authorized redirect URIs:
-   - `http://localhost:5173/api/auth/callback/google` (local)
-   - `https://day-zero.dropoutstudio.co/api/auth/callback/google` (production)
+Values live in `.dev.vars` locally and as Worker secrets or vars in production.
 
----
+| Variable | Purpose |
+| --- | --- |
+| `BETTER_AUTH_SECRET` | Signs sessions. Required. |
+| `BETTER_AUTH_URL` | App origin, for example `http://localhost:5173`. Required. |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID. Required for sign-in. |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret. Required for sign-in. |
+| `TOKEN_ENCRYPTION_KEY` | Base64 32-byte key that encrypts each user's Cloudflare token. Required for the copilot. |
+| `PUBLIC_GOOGLE_CLIENT_ID` | Optional. Enables Google One Tap; the Google button still works without it. |
+| `AI_COPILOT_ENABLED` | Set to `"false"` to turn the copilot off. |
+| `AI_MONTHLY_CAP_USD` | Optional monthly copilot spend cap in US dollars. |
+| `E2E_BYPASS_AUTH` | Local only. `true` signs requests in as the test user. |
 
-## Contributing
+Remote Drizzle commands (`bun run db:push`, `db:pull`, `db:studio`) read `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_DATABASE_ID`, and `CLOUDFLARE_D1_TOKEN` from a `.env` file.
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for local setup, architecture guidelines, coding standards, and the commit and PR workflow. [CLAUDE.md](./CLAUDE.md) documents the architecture and conventions in depth.
+**Never enable `E2E_BYPASS_AUTH` in production.** It grants full unauthenticated access.
+
+## Troubleshooting
+
+**Every page returns a 500 after you enable `E2E_BYPASS_AUTH`.** The local D1 database has no tables. Run `bun run db:migrate:local`.
+
+**Google sign-in fails.** Add `http://localhost:5173/api/auth/callback/google` as an authorized redirect URI, and make sure `BETTER_AUTH_URL` matches the URL you open.
+
+**The copilot says your Cloudflare account is not connected.** Open `/settings` and connect your own Cloudflare account (account ID, API token, model), and make sure `TOKEN_ENCRYPTION_KEY` is set. The copilot cannot run fully in local development.
 
 ## License
 
 MIT — see [LICENSE](./LICENSE).
-
-## Author
-
-**Rahi Khan** · [beyourahi.com](https://beyourahi.com) · [beyourahi@gmail.com](mailto:beyourahi@gmail.com)
