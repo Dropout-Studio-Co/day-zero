@@ -57,17 +57,17 @@ To skip Google sign-in locally, set `E2E_BYPASS_AUTH=true` in `.dev.vars`. Run `
 
 Values live in `.dev.vars` locally and as Worker secrets or vars in production.
 
-| Variable | Purpose |
-| --- | --- |
-| `BETTER_AUTH_SECRET` | Signs sessions. Required. |
-| `BETTER_AUTH_URL` | App origin, for example `http://localhost:5173`. Required. |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID. Required for sign-in. |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret. Required for sign-in. |
-| `TOKEN_ENCRYPTION_KEY` | Base64 32-byte key that encrypts each user's Cloudflare token. Required for the copilot. |
-| `PUBLIC_GOOGLE_CLIENT_ID` | Optional. Enables Google One Tap; the Google button still works without it. |
-| `AI_COPILOT_ENABLED` | Set to `"false"` to turn the copilot off. |
-| `AI_MONTHLY_CAP_USD` | Optional monthly copilot spend cap in US dollars. |
-| `E2E_BYPASS_AUTH` | Local only. `true` signs requests in as the test user. |
+| Variable                  | Purpose                                                                                  |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| `BETTER_AUTH_SECRET`      | Signs sessions. Required.                                                                |
+| `BETTER_AUTH_URL`         | App origin, for example `http://localhost:5173`. Required.                               |
+| `GOOGLE_CLIENT_ID`        | Google OAuth client ID. Required for sign-in.                                            |
+| `GOOGLE_CLIENT_SECRET`    | Google OAuth client secret. Required for sign-in.                                        |
+| `TOKEN_ENCRYPTION_KEY`    | Base64 32-byte key that encrypts each user's Cloudflare token. Required for the copilot. |
+| `PUBLIC_GOOGLE_CLIENT_ID` | Optional. Enables Google One Tap; the Google button still works without it.              |
+| `AI_COPILOT_ENABLED`      | Set to `"false"` to turn the copilot off.                                                |
+| `AI_MONTHLY_CAP_USD`      | Optional monthly copilot spend cap in US dollars.                                        |
+| `E2E_BYPASS_AUTH`         | Local only. `true` signs requests in as the test user.                                   |
 
 Remote Drizzle commands (`bun run db:push`, `db:pull`, `db:studio`) read `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_DATABASE_ID`, and `CLOUDFLARE_D1_TOKEN` from a `.env` file.
 
