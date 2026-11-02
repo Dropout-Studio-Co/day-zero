@@ -16,6 +16,12 @@ updates:
       js-minor-patch:
         patterns: ["*"]
         update-types: ["minor", "patch"]
+    # Majors are deliberate migrations, so they are ignored here rather than
+    # proposed weekly. `ignore` filters version updates only; Dependabot security
+    # updates are unaffected and still open on their own.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -27,3 +33,6 @@ updates:
     groups:
       github-actions:
         patterns: ["*"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
