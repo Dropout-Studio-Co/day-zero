@@ -16,7 +16,7 @@ Day Zero is a countdown tracker for goals and milestones. Each countdown points 
 
 ## Requirements
 
-- Bun 1.2 or newer and Node.js 20.19+ or 22.12+.
+- Bun 1.2 or newer and Node.js 22.12 or newer.
 - A Google OAuth 2.0 client for sign-in (you can skip it locally with `E2E_BYPASS_AUTH=true`).
 - A Cloudflare account with a D1 database named `day_zero` to deploy.
 
