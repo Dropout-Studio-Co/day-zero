@@ -69,21 +69,23 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      # Advisory and upstream-version drift is visible but must not mask the lint and
-      # secret signals: `bun audit` reports advisories in pinned upstream packages
-      # (vite, zod, better-auth, wrangler's transitive undici/sharp) that are fixed by
-      # dependency bumps, not by this change. See the advisory list in the job summary
-      # and the PR body; the step is repeated here as a record, not a gate.
-      - name: Dependency audit (report only)
+      # BLOCKING at critical only. A critical advisory means a dependency this app
+      # actually ships has a known exploit and needs review; that must fail the PR.
+      # Highs and below are printed by `bun audit` but deliberately do not gate: after
+      # the 2026-11 dependency bump nothing above moderate is left, and what remains is
+      # dev/build toolchain only — esbuild (through drizzle-kit, vite's tsx, wrangler)
+      # and minimatch (through eslint/typescript-eslint) — plus three lows blocked
+      # behind an upstream major (SvelteKit 3, its cookie, deepmerge via
+      # vite-plugin-svelte). Gating on those would only train people to bypass the step.
+      - name: Dependency audit (critical only)
         id: audit
-        continue-on-error: true
-        run: bun audit --audit-level=high
+        run: bun audit --audit-level=critical
 
       - name: Restore lint caches
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
           path: node_modules/.cache/lint
-          key: lint-${{ runner.os }}-${{ hashFiles('bun.lock', '.prettierrc', '.prettierignore', 'eslint.config.js') }}-${{ github.sha }}
+          key: lint-${{ runner.os }}-${{ hashFiles('bun.lock', '.prettierrc', '.prettierignore', 'eslint.config.js') }}
           restore-keys: lint-${{ runner.os }}-${{ hashFiles('bun.lock', '.prettierrc', '.prettierignore', 'eslint.config.js') }}-
 
       - name: Format and lint
@@ -104,7 +106,7 @@ jobs:
             echo "| check | result |"
             echo "| --- | --- |"
             echo "| gitleaks (change range) | scanned \`${RANGE:-full history}\` |"
-            echo "| bun audit --audit-level=high | ${AUDIT_OUTCOME} (advisory, non-blocking) |"
+            echo "| bun audit --audit-level=critical | ${AUDIT_OUTCOME} (blocking: high and below are printed, not gated) |"
             echo "| prettier + eslint | see step logs |"
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -125,6 +127,9 @@ jobs:
 
       - name: Unit tests
         run: bun run test
+
+      - name: Vendored design-system contract tests
+        run: bun run test:ds
 
   build:
     name: build
