@@ -1,0 +1,29 @@
+version: 2
+
+# Weekly, grouped dependency updates. The JavaScript ecosystem entry is `bun`, not
+# `npm`: this repository installs and locks with Bun (`bun.lock`), and Dependabot's npm
+# ecosystem refuses a project whose only lockfile is bun.lock. Grouped minor/patch
+# bumps arrive as one PR; majors stay separate so they can be reviewed individually.
+updates:
+  - package-ecosystem: "bun"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      js-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(ci)"
+    groups:
+      github-actions:
+        patterns: ["*"]

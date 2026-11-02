@@ -14,6 +14,7 @@
  */
 import type { Countdown, CountdownInput, CountdownPatch } from "$lib/types";
 import { api, debounceSync, sync } from "$lib/api/client";
+import { applyOrder, orderByPosition, partitionCountdowns } from "$lib/countdown/partition";
 import { readLocal, writeLocal, clearLocal } from "$lib/persistence/local";
 import { clock } from "./clock.svelte";
 
@@ -34,8 +35,6 @@ const applyPatch = (c: Countdown, patch: CountdownPatch): Countdown => ({
 	...(patch.targetAt !== undefined ? { targetAt: patch.targetAt } : {}),
 	...(patch.hasTime !== undefined ? { hasTime: patch.hasTime } : {})
 });
-
-const ms = (iso: string): number => Date.parse(iso);
 
 const createCountdownsStore = () => {
 	let countdowns = $state<Countdown[]>([]);
@@ -70,7 +69,7 @@ const createCountdownsStore = () => {
 			clearLocal(GUEST_KEY);
 			return;
 		}
-		const ordered = [...guest].sort((a, b) => a.position - b.position);
+		const ordered = orderByPosition(guest);
 		const created: Countdown[] = [];
 		const failed: Countdown[] = [];
 		for (const g of ordered) {
@@ -141,16 +140,7 @@ const createCountdownsStore = () => {
 	// Reorders local state to match orderedIds (appending any unlisted survivors),
 	// then persists the new order via the PUT /api/countdowns endpoint.
 	const reorder = (orderedIds: string[]) => {
-		const byId = new Map(countdowns.map((c) => [c.id, c]));
-		const next: Countdown[] = [];
-		for (const id of orderedIds) {
-			const c = byId.get(id);
-			if (c) next.push(c);
-		}
-		for (const c of countdowns) {
-			if (!orderedIds.includes(c.id)) next.push(c);
-		}
-		countdowns = next;
+		countdowns = applyOrder(countdowns, orderedIds);
 		if (!authed) {
 			saveLocal();
 			return;
@@ -189,19 +179,10 @@ const createCountdownsStore = () => {
 	};
 
 	const active = $derived(countdowns);
-	const upcoming = $derived.by(() => {
-		const now = clock.now;
-		return active
-			.filter((c) => ms(c.targetAt) > now)
-			.sort((a, b) => ms(a.targetAt) - ms(b.targetAt));
-	});
-	const past = $derived.by(() => {
-		const now = clock.now;
-		return active
-			.filter((c) => ms(c.targetAt) <= now)
-			.sort((a, b) => ms(b.targetAt) - ms(a.targetAt));
-	});
-	const hero = $derived(upcoming[0] ?? null);
+	const partition = $derived.by(() => partitionCountdowns(active, clock.now));
+	const upcoming = $derived(partition.upcoming);
+	const past = $derived(partition.past);
+	const hero = $derived(partition.hero);
 
 	return {
 		get all() {

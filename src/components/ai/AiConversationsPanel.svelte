@@ -36,7 +36,7 @@
 				{@const active = conversation.id === ai.activeConversationId}
 				<li
 					class={cn(
-						"flex select-none items-center gap-1 rounded-lg border border-solid px-2 py-1.5 transition-colors",
+						"flex items-center gap-1 rounded-lg border border-solid px-2 py-1.5 transition-colors select-none",
 						active
 							? "border-chat-border bg-chat-surface-hover"
 							: "border-chat-border-subtle bg-chat-surface hover:bg-chat-surface-hover"

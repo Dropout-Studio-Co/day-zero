@@ -1,0 +1,142 @@
+name: ci
+
+# Pull-request and main-branch verification. Deploys are NOT handled here: Cloudflare
+# Workers Builds deploys the app from the connected repository, so CI only proves a
+# candidate is secret-free, lint-clean, type-safe, tested, and buildable.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One run per PR (a new push cancels the stale one) and one run per commit on main.
+concurrency:
+  group: ci-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: secrets, audit and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      # SHA256 of gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz, taken from the signed
+      # release checksums. The tarball is verified before it is ever executed.
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Find the commits to check
+        id: range
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          range=""
+          if [ "$EVENT" = pull_request ]; then
+            range="$PR_BASE..HEAD"
+          elif [ "$EVENT" = push ] && [ -n "$PUSH_BEFORE" ] \
+            && ! printf '%s' "$PUSH_BEFORE" | grep -Eqx '0+' \
+            && git cat-file -e "$PUSH_BEFORE^{commit}" 2>/dev/null; then
+            range="$PUSH_BEFORE..HEAD"
+          fi
+          echo "range=$range" >> "$GITHUB_OUTPUT"
+          echo "Commits under review: ${range:-full history (no usable parent commit)}"
+
+      - name: Scan the change range for secrets
+        env:
+          RANGE: ${{ steps.range.outputs.range }}
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/gitleaks.tgz" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  $RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+          if [ -n "$RANGE" ]; then
+            "$RUNNER_TEMP/gitleaks" git --no-banner --redact --exit-code 1 --log-opts="$RANGE" .
+          else
+            "$RUNNER_TEMP/gitleaks" git --no-banner --redact --exit-code 1 .
+          fi
+
+      - uses: ./.github/actions/setup
+
+      # Advisory and upstream-version drift is visible but must not mask the lint and
+      # secret signals: `bun audit` reports advisories in pinned upstream packages
+      # (vite, zod, better-auth, wrangler's transitive undici/sharp) that are fixed by
+      # dependency bumps, not by this change. See the advisory list in the job summary
+      # and the PR body; the step is repeated here as a record, not a gate.
+      - name: Dependency audit (report only)
+        id: audit
+        continue-on-error: true
+        run: bun audit --audit-level=high
+
+      - name: Restore lint caches
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: node_modules/.cache/lint
+          key: lint-${{ runner.os }}-${{ hashFiles('bun.lock', '.prettierrc', '.prettierignore', 'eslint.config.js') }}-${{ github.sha }}
+          restore-keys: lint-${{ runner.os }}-${{ hashFiles('bun.lock', '.prettierrc', '.prettierignore', 'eslint.config.js') }}-
+
+      - name: Format and lint
+        run: |
+          mkdir -p node_modules/.cache/lint
+          bunx prettier --check --cache --cache-strategy content --cache-location node_modules/.cache/lint/prettier .
+          bunx eslint --cache --cache-strategy content --cache-location node_modules/.cache/lint/eslint .
+
+      - name: Summarize
+        if: always()
+        env:
+          AUDIT_OUTCOME: ${{ steps.audit.outcome }}
+          RANGE: ${{ steps.range.outputs.range }}
+        run: |
+          {
+            echo "### lint"
+            echo
+            echo "| check | result |"
+            echo "| --- | --- |"
+            echo "| gitleaks (change range) | scanned \`${RANGE:-full history}\` |"
+            echo "| bun audit --audit-level=high | ${AUDIT_OUTCOME} (advisory, non-blocking) |"
+            echo "| prettier + eslint | see step logs |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  typecheck:
+    name: types and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+
+      - name: Typecheck
+        run: bun run check
+
+      - name: Unit tests
+        run: bun run test
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+
+      - name: Build the Cloudflare bundle
+        run: bun run build
