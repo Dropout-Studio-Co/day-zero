@@ -140,7 +140,6 @@ The project follows the standard SvelteKit layout:
 │   └── hooks.client.ts  # Client-side error handling
 ├── static/              # Static assets
 ├── wrangler.jsonc       # Cloudflare Workers config + bindings
-├── svelte.config.js     # SvelteKit config + path aliases
 ├── vite.config.ts       # Vite config
 ├── drizzle.config.ts    # Drizzle ORM config
 ├── tsconfig.json        # TypeScript strict config
@@ -149,7 +148,7 @@ The project follows the standard SvelteKit layout:
 
 ### Path Aliases
 
-Use the path aliases configured in `svelte.config.js` (`$lib` for `src/lib/`, plus any others the project defines). **Never use relative paths from route files** — always import through an alias.
+Use the path aliases declared in `package.json` `imports` (`#lib` for `src/lib/`, with explicit file extensions) and in `vite.config.ts`/`tsconfig.json` (`$src` for `src/`). **Never use relative paths from route files** — always import through an alias.
 
 ---
 
@@ -184,7 +183,7 @@ Use `onMount` for DOM/lifecycle work. Reach for `$effect` only when reacting to 
 - Strict mode is enforced. No `any`. No type assertions (`as T`) without justification.
 - Use `import type { ... }` for type-only imports.
 - Define all component prop types explicitly.
-- Use `cn()` from `$lib/utils` for conditional or merged class names.
+- Use `cn()` from `#lib/utils.js` for conditional or merged class names.
 
 ### Tailwind CSS v4
 

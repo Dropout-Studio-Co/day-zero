@@ -12,10 +12,10 @@
  * instant a countdown crosses zero (upcoming → past). `ai*` methods mutate local
  * state only and exist so the AI copilot can reflect its API writes on the board.
  */
-import type { Countdown, CountdownInput, CountdownPatch } from "$lib/types";
-import { api, debounceSync, sync } from "$lib/api/client";
-import { applyOrder, orderByPosition, partitionCountdowns } from "$lib/countdown/partition";
-import { readLocal, writeLocal, clearLocal } from "$lib/persistence/local";
+import type { Countdown, CountdownInput, CountdownPatch } from "#lib/types.js";
+import { api, debounceSync, sync } from "#lib/api/client.js";
+import { applyOrder, orderByPosition, partitionCountdowns } from "#lib/countdown/partition.js";
+import { readLocal, writeLocal, clearLocal } from "#lib/persistence/local.js";
 import { clock } from "./clock.svelte";
 
 // Versioned localStorage key holding the logged-out user's board.

@@ -1,7 +1,7 @@
 <!-- Small icon + DS Eyebrow (mono, uppercase, wide-tracked) above a form section heading. -->
 <script lang="ts">
 	import type { LucideIcon } from "@lucide/svelte";
-	import { Eyebrow } from "$lib/ds";
+	import { Eyebrow } from "#lib/ds/index.js";
 
 	// LucideIcon is the exported "an icon component" type (`Component<LucideProps>`). Do not use
 	// `ComponentProps<typeof Icon>`: the generic Icon takes a discriminated icon/iconNode union,

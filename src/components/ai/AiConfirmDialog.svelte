@@ -7,12 +7,12 @@
 	import { tick } from "svelte";
 	import { fade, scale } from "svelte/transition";
 	import { cubicOut } from "svelte/easing";
-	import { ai } from "$lib/stores/ai.svelte";
-	import { respondToConfirmation, respondToAllConfirmations } from "$lib/ai/chat-client";
-	import { motionDuration } from "$lib/motion";
+	import { ai } from "#lib/stores/ai.svelte.js";
+	import { respondToConfirmation, respondToAllConfirmations } from "#lib/ai/chat-client.js";
+	import { motionDuration } from "#lib/motion/index.js";
 	import { ShieldCheck, Undo2 } from "@lucide/svelte";
-	import { toolLabel } from "$lib/ai/tool-labels";
-	import { Switch } from "$lib/components/ui/switch";
+	import { toolLabel } from "#lib/ai/tool-labels.js";
+	import { Switch } from "#lib/components/ui/switch/index.js";
 
 	const first = $derived(ai.pendingConfirmations[0] ?? null);
 	const isBatch = $derived(ai.pendingConfirmations.length > 1);

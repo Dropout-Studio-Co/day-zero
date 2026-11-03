@@ -4,11 +4,11 @@
 import { createAuthClient } from "better-auth/svelte";
 import { oneTapClient } from "better-auth/client/plugins";
 import { passkeyClient } from "@better-auth/passkey/client";
-import { env } from "$env/dynamic/public";
+import { PUBLIC_GOOGLE_CLIENT_ID } from "$app/env/public";
 
 // Browser-exposed Google OAuth client id (non-secret) for One Tap. Empty where it isn't
 // configured → One Tap is simply never triggered (the login page guards on this value).
-const googleClientId = env.PUBLIC_GOOGLE_CLIENT_ID ?? "";
+const googleClientId = PUBLIC_GOOGLE_CLIENT_ID ?? "";
 
 export const authClient = createAuthClient({
 	plugins: [

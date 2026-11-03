@@ -9,7 +9,7 @@
  * @see $lib/server/ai-undo.ts (applies these), ./executor.ts (records them).
  */
 
-import type { Countdown } from "$lib/types";
+import type { Countdown } from "#lib/types.js";
 import type { InverseRecord } from "./types";
 
 export type { InverseRecord } from "./types";

@@ -6,14 +6,14 @@
 	"reached" state automatically.
 -->
 <script lang="ts">
-	import { clock } from "$lib/stores/clock.svelte";
-	import { countdowns } from "$lib/stores/countdowns.svelte";
-	import { remaining, formatTargetDate } from "$lib/countdown/format";
-	import { cn } from "$lib/utils";
-	import * as Dialog from "$lib/components/ui/dialog";
+	import { clock } from "#lib/stores/clock.svelte.js";
+	import { countdowns } from "#lib/stores/countdowns.svelte.js";
+	import { remaining, formatTargetDate } from "#lib/countdown/format.js";
+	import { cn } from "#lib/utils.js";
+	import * as Dialog from "#lib/components/ui/dialog/index.js";
 	import CountdownDisplay from "./CountdownDisplay.svelte";
 	import { Pencil, Share2, Trash2 } from "@lucide/svelte";
-	import type { Countdown } from "$lib/types";
+	import type { Countdown } from "#lib/types.js";
 
 	let {
 		countdown,

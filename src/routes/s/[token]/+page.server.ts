@@ -6,11 +6,12 @@
  */
 import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import { getDatabase } from "$lib/server/db";
-import { getByShareToken } from "$lib/server/repositories/countdowns";
+import { getDatabase } from "#lib/server/db.js";
+import { getByShareToken } from "#lib/server/repositories/countdowns.js";
+import { env } from "cloudflare:workers";
 
-export const load: PageServerLoad = async ({ params, platform }) => {
-	const d1 = platform?.env?.DB;
+export const load: PageServerLoad = async ({ params }) => {
+	const d1 = env.DB;
 	if (!d1) throw error(503, "Database unavailable");
 
 	const countdown = await getByShareToken(getDatabase(d1), params.token);

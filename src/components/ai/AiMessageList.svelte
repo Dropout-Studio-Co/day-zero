@@ -4,7 +4,7 @@
 	retry instead of crashing the whole rail.
 -->
 <script lang="ts">
-	import type { AiMessage } from "$lib/stores/ai.svelte";
+	import type { AiMessage } from "#lib/stores/ai.svelte.js";
 	import AiMessageComponent from "./AiMessage.svelte";
 	import AiTypingIndicator from "./AiTypingIndicator.svelte";
 

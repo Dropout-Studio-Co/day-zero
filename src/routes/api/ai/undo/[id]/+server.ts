@@ -1,8 +1,8 @@
-import { error, json } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
-import { requireApiContext } from "$lib/server/api";
-import { getActionById, markUndone, markUndoFailed } from "$lib/server/repositories/ai-actions";
-import { applyInverse, UndoInvalidatedError } from "$lib/server/ai-undo";
+import { requireApiContext } from "#lib/server/api.js";
+import { getActionById, markUndone, markUndoFailed } from "#lib/server/repositories/ai-actions.js";
+import { applyInverse, UndoInvalidatedError } from "#lib/server/ai-undo.js";
 
 /**
  * POST /api/ai/undo/[id] — reverses a previously applied AI action server-side by
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async (event) => {
 	try {
 		const effect = await applyInverse(db, userId, action.inverse);
 		await markUndone(db, userId, id);
-		return json({ id, status: "undone", effect });
+		return Response.json({ id, status: "undone", effect });
 	} catch (err) {
 		const message =
 			err instanceof UndoInvalidatedError

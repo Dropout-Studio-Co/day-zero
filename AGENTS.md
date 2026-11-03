@@ -19,7 +19,7 @@ The existing Dropout DS and Day Zero visual language win during constrained work
 
 **Day Zero** — a goal/milestone **countdown tracker** (a Dropout Studio free/public tool, sibling to `order-processor` and `invoice-generator`). A user creates countdowns toward a target date for a goal, makes many, and sees them all at once on one board: the soonest upcoming goal is promoted to an oversized **hero**, the rest fill a responsive grid, and reached goals collapse into a quieter section. A countdown is either kept or deleted (delete asks for confirmation) — there is no archive. Any countdown can be shared via a read-only public link (`/s/[token]`). An AI copilot manages countdowns in natural language. **No ads.**
 
-**Stack**: SvelteKit 2 + Svelte 5 runes · TypeScript strict · Tailwind v4 (CSS-first; tokens from `@dropout/ds`, vendored) + shadcn-svelte · Better Auth (Google OAuth + Google One Tap + passkey/WebAuthn biometrics; email/password disabled) · Cloudflare D1 + Drizzle · Cloudflare Workers AI (copilot, **BYO** per-user via REST) · GSAP · Bun. Dark-only (`app.html` hardcodes `<html class="dark">`).
+**Stack**: SvelteKit 3 + Svelte 5 runes · TypeScript strict · Tailwind v4 (CSS-first; tokens from `@dropout/ds`, vendored) + shadcn-svelte · Better Auth (Google OAuth + Google One Tap + passkey/WebAuthn biometrics; email/password disabled) · Cloudflare D1 + Drizzle · Cloudflare Workers AI (copilot, **BYO** per-user via REST) · GSAP · Bun. Dark-only (`app.html` hardcodes `<html class="dark">`).
 
 **Auth is optional, not a wall**: logged-out visitors get the **full board**, persisted to `localStorage` (`day-zero:guest:v1`); signing in unlocks server storage, cross-device sync, shareable links, and the AI Copilot. The board (`/`) no longer redirects — only `/settings` redirects to `/login` when signed out. No global guard (none in `hooks.server.ts`/`+layout.server.ts`); routes are public by default, but `/api/*` mutations and `/api/ai/*` stay 401-gated. Authed data is scoped to `userId` in D1; guest data lives only in the browser and is migrated into the account on first sign-in (`countdowns.migrateGuestToServer`).
 
@@ -28,7 +28,7 @@ The existing Dropout DS and Day Zero visual language win during constrained work
 ## Commands
 
 ```bash
-bun run dev               # vite dev (--open --host); bindings via platformProxy + .dev.vars
+bun run dev               # vite dev (--open --host); bindings via the adapter's platform proxy + .dev.vars
 bun run build             # production build (Cloudflare adapter)
 bun run preview           # build + wrangler dev (full Workers preview)
 bun run check             # svelte-check (strict TS) — must be 0 errors/0 warnings
@@ -50,9 +50,9 @@ bun run cf-typegen        # regenerate worker-configuration.d.ts after wrangler.
 
 ### Path aliases
 
-`$lib` → `src/lib/` (SvelteKit default) · `$src` → `src/` (custom; route files import `$src/components/*`). Never use relative paths from route files.
+`#lib` → `src/lib/` (SvelteKit default) · `$src` → `src/` (custom; route files import `$src/components/*`). Never use relative paths from route files.
 
-### Design system (`$lib/ds`)
+### Design system (`#lib/ds`)
 
 **HARD RULE — the Dropout DS guidelines are binding.** Every UI/design change in this repo MUST obey **`~/Desktop/projects/dropout-design-system/GUIDELINES.md`** — the law for all UI: tokens, typography, layout shells, the shadcn-svelte primitive layer (pinned `components.json` preset + blessed kit), overlay/glass tokens, motion, a11y. Non-negotiable: theme via tokens, **never recolor a component**, components before custom markup. This applies automatically to every UI task whether or not the request mentions it. This project vendors `@dropout/ds` at `src/lib/ds/`.
 
@@ -75,7 +75,7 @@ The frontend runs on the **Dropout Design System**, **vendored** at `src/lib/ds/
 ### UI
 
 - `src/routes/+page.svelte` — the board. Server data is seeded ONCE inside `untrack()` (`countdowns.hydrate` + `ai.hydrate`); a separate `onMount` bridge then runs the browser-only guest path (authed → `migrateGuestToServer`, guest → `loadGuest`). Hero + grid + past sections; `use:reveal` entrance motion. Guests see `SignInButton`; the share control is hidden when logged out (`canShare`).
-- `src/components/` (app components, imported via `$src/components/*`) — `CountdownDisplay` (the shared boxed-tile digits unit with tick animation; hero/card/share sizes; reads the clock), `CountdownHero`, `CountdownCard`, `CountdownCalendar` (local DS-styled date picker built on the bits-ui Calendar primitive — replaces the unthemeable native `<input type="date">`; bindable `@internationalized/date` `DateValue`), `CountdownComposerDialog` (create/edit; uses `CountdownCalendar` + Switch-gated 12h AM/PM time → absolute UTC ISO), `ShareDialog`, `SectionEyebrow`, `EmptyState`, `Navbar` (invisible, in-flow top nav holding the `SignInButton`/`User` auth controls; shifts left when the copilot rail opens), `SignInButton`, `User`, `ai/*` (copilot UI — overlay drawer: `AiDesktopLauncher`/`AiSidebar` on lg+, `AiMobileFab`/`AiMobileSheet` on mobile). shadcn-svelte primitives live separately in `$lib/components/ui/*` (auto-generated — don't hand-edit).
+- `src/components/` (app components, imported via `$src/components/*`) — `CountdownDisplay` (the shared boxed-tile digits unit with tick animation; hero/card/share sizes; reads the clock), `CountdownHero`, `CountdownCard`, `CountdownCalendar` (local DS-styled date picker built on the bits-ui Calendar primitive — replaces the unthemeable native `<input type="date">`; bindable `@internationalized/date` `DateValue`), `CountdownComposerDialog` (create/edit; uses `CountdownCalendar` + Switch-gated 12h AM/PM time → absolute UTC ISO), `ShareDialog`, `SectionEyebrow`, `EmptyState`, `Navbar` (invisible, in-flow top nav holding the `SignInButton`/`User` auth controls; shifts left when the copilot rail opens), `SignInButton`, `User`, `ai/*` (copilot UI — overlay drawer: `AiDesktopLauncher`/`AiSidebar` on lg+, `AiMobileFab`/`AiMobileSheet` on mobile). shadcn-svelte primitives live separately in `#lib/components/ui/*` (auto-generated — don't hand-edit).
 - `src/routes/login/+page.svelte` — three sign-in paths: "Continue with Google" (social OAuth), auto-prompted Google One Tap (only when `PUBLIC_GOOGLE_CLIENT_ID` is set + in browser), and "Sign in with Face ID / Touch ID" (WebAuthn platform biometrics; hidden where the browser lacks WebAuthn). Passkeys are _registered_ in `/settings`, not here.
 - `src/routes/changelog/+page.svelte` — public, static changelog page; entries sourced from `src/lib/data/changelog.ts`. `src/routes/settings/+page.svelte` — BYO-Cloudflare connect form (account id + API token + model picker) **+ Face ID / Touch ID management** (list / add / remove; platform-biometric only — `authenticatorAttachment: "platform"`, no roaming security keys).
 - `src/lib/countdown/format.ts` — pure, SSR-safe time math (`remaining`, `humanize`, `formatTargetDate`). Granularity rule: **live seconds ALWAYS tick** (hero, cards, share, zen alike); the Days segment leads only once ≥1 full day remains, else H/M/S. `hasTime` no longer affects segments. `now` is passed in (never read inside) so server/first-client renders match.
@@ -95,8 +95,8 @@ Gated by `AI_COPILOT_ENABLED` (set `"false"` to disable) **and signed-in only**.
 - **Svelte 5 runes only** — `$state`/`$derived`/`$props`/`$effect`; never `export let` or `$:`. Arrow functions, double quotes, tabs, no trailing commas (Prettier).
 - **`untrack()` hydration** — `+page.svelte` seeds SERVER data once inside `untrack()`. Do not add a second server-hydrate path; the guest `localStorage` re-seed is the separate `onMount` bridge (browser-only, additive).
 - **Snake_case D1 columns** — required by the Better Auth Drizzle adapter; renaming breaks auth.
-- **Two `cn()`** — use `$lib/ds` `cn()` inside DS-token markup (handles custom `text-*` sizes); `$lib/utils` `cn()` everywhere else. Countdown digits use plain Tailwind `text-*` sizes + `tabular-nums`.
-- **GSAP only via `$lib/motion`** — never a top-level `import ... from "gsap"` (SSR-unsafe on Workers). All motion respects `prefers-reduced-motion`.
+- **Two `cn()`** — use `#lib/ds/utils.js` `cn()` inside DS-token markup (handles custom `text-*` sizes); `#lib/utils.js` `cn()` everywhere else. Countdown digits use plain Tailwind `text-*` sizes + `tabular-nums`.
+- **GSAP only via `#lib/motion`** — never a top-level `import ... from "gsap"` (SSR-unsafe on Workers). All motion respects `prefers-reduced-motion`.
 - **Never nest `<button>` in `<button>`** — SSR auto-closes and desyncs hydration (whole-app double-render). Use `div[role="button"]` + tabindex/keydown, inner actions `stopPropagation`.
 - **Vendored DS is read-only** — edit upstream + `sync-ds`.
 - **Icons via `@lucide/svelte`** — import named icon components (e.g. `Fingerprint`, `ArrowLeft`); scoped package, not `lucide-svelte`. No inline SVGs.
@@ -119,7 +119,7 @@ Gated by `AI_COPILOT_ENABLED` (set `"false"` to disable) **and signed-in only**.
 
 ## Cloudflare bindings & production
 
-`wrangler.jsonc`: `DB` (D1 `day_zero`, required — absent at runtime, `/api/*` returns 503), `AI` (Workers AI, `remote: true` — typing/compat only; inference is BYO REST), `AI_QUOTA_KV` (optional quota/spend + `cf-models` cache). `compatibility_flags: ["nodejs_compat"]` is **required** — Better Auth and the AI layer use Node built-ins; removing it breaks auth at runtime. `account_id` = Personal. Served ONLY on the custom domain `day-zero.dropoutstudio.co` (`workers_dev: false`, `preview_urls: false` — one canonical origin for OAuth/CSRF). Vars: `BETTER_AUTH_URL`, `AI_COPILOT_ENABLED`, `AI_MONTHLY_CAP_USD`, `PUBLIC_GOOGLE_CLIENT_ID` (browser-public, non-secret — enables Google One Tap; empty → One Tap stays off but the Google button still works). Passkey `rpID`/`origin` are auto-derived from `BETTER_AUTH_URL` — no extra config.
+Bindings are read as `env` from **`cloudflare:workers`** (SvelteKit 3 dropped the Cloudflare `platform` shim) and typed by the `Cloudflare.Env` augmentation in `src/app.d.ts` — no generated `worker-configuration.d.ts` is needed. `wrangler.jsonc`: `DB` (D1 `day_zero`, required — absent at runtime, `/api/*` returns 503), `AI` (Workers AI, `remote: true` — typing/compat only; inference is BYO REST), `AI_QUOTA_KV` (optional quota/spend + `cf-models` cache). `compatibility_flags: ["nodejs_compat"]` is **required** — Better Auth and the AI layer use Node built-ins; removing it breaks auth at runtime. `account_id` = Personal. Served ONLY on the custom domain `day-zero.dropoutstudio.co` (`workers_dev: false`, `preview_urls: false` — one canonical origin for OAuth/CSRF). Vars: `BETTER_AUTH_URL`, `AI_COPILOT_ENABLED`, `AI_MONTHLY_CAP_USD`, `PUBLIC_GOOGLE_CLIENT_ID` (browser-public, non-secret — enables Google One Tap; empty → One Tap stays off but the Google button still works). Passkey `rpID`/`origin` are auto-derived from `BETTER_AUTH_URL` — no extra config.
 
 **Secrets** (`wrangler secret put`): `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `TOKEN_ENCRYPTION_KEY` (base64 32 bytes — encrypts each user's BYO Cloudflare token; copilot is disabled without it).
 

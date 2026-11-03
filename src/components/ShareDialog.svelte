@@ -6,10 +6,10 @@
 -->
 <script lang="ts">
 	import { page } from "$app/state";
-	import * as Dialog from "$lib/components/ui/dialog";
-	import { Switch } from "$lib/components/ui/switch";
-	import { cn, inputBase } from "$lib/ds";
-	import { countdowns } from "$lib/stores/countdowns.svelte";
+	import * as Dialog from "#lib/components/ui/dialog/index.js";
+	import { Switch } from "#lib/components/ui/switch/index.js";
+	import { cn, inputBase } from "#lib/ds/index.js";
+	import { countdowns } from "#lib/stores/countdowns.svelte.js";
 	import { Check, Copy } from "@lucide/svelte";
 
 	let {

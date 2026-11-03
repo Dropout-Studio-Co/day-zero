@@ -7,9 +7,9 @@
  */
 
 import { eq } from "drizzle-orm";
-import type { Database } from "$lib/server/db";
-import { userSettings } from "$lib/server/schema";
-import { deriveTokenKey, decryptToken } from "$lib/server/crypto";
+import type { Database } from "#lib/server/db.js";
+import { userSettings } from "#lib/server/schema.js";
+import { deriveTokenKey, decryptToken } from "#lib/server/crypto.js";
 import { DEFAULT_MODEL, type CloudflareCreds } from "./run-rest";
 
 export interface CloudflareConfig {

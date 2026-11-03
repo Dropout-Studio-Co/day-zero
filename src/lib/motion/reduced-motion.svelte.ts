@@ -4,7 +4,7 @@
  * that updates live on the media-query `change` event. SSR-safe: defaults to
  * false off the browser. Every animation must gate on `prefersReducedMotion.current`.
  */
-import { browser } from "$app/environment";
+import { browser } from "$app/env";
 
 const QUERY = "(prefers-reduced-motion: reduce)";
 

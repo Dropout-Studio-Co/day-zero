@@ -2,7 +2,7 @@
  * Static app metadata consumed for <title>/<meta> tags. `siblings` are related
  * Dropout tools cross-linked in the UI.
  */
-import type { AppConfig } from "$lib/types";
+import type { AppConfig } from "#lib/types.js";
 
 export const APP_CONFIG: AppConfig = {
 	name: "Day Zero",

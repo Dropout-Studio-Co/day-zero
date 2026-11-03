@@ -1,11 +1,12 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import type { Actions, PageServerLoad } from "./$types";
-import { getDatabase } from "$lib/server/db";
-import { userSettings } from "$lib/server/schema";
-import { deriveTokenKey, encryptToken, decryptToken, maskToken } from "$lib/server/crypto";
-import { listChatModels, DEFAULT_MODEL, type CfModel } from "$lib/server/ai/run-rest";
-import { describeCloudflareError } from "$lib/server/ai/errors";
+import { getDatabase } from "#lib/server/db.js";
+import { userSettings } from "#lib/server/schema.js";
+import { deriveTokenKey, encryptToken, decryptToken, maskToken } from "#lib/server/crypto.js";
+import { listChatModels, DEFAULT_MODEL, type CfModel } from "#lib/server/ai/run-rest.js";
+import { describeCloudflareError } from "#lib/server/ai/errors.js";
+import { env } from "cloudflare:workers";
 
 /**
  * Settings page server module. Connects the user's own Cloudflare account so the
@@ -18,7 +19,7 @@ import { describeCloudflareError } from "$lib/server/ai/errors";
  *          models (proves token + account + Workers AI permission), caches that
  *          list, then encrypts + upserts. Empty token preserves the existing blob.
  */
-export const load: PageServerLoad = async ({ locals, platform, request }) => {
+export const load: PageServerLoad = async ({ locals, request }) => {
 	if (!locals.user) {
 		redirect(303, "/login");
 	}
@@ -39,11 +40,11 @@ export const load: PageServerLoad = async ({ locals, platform, request }) => {
 		platformHint
 	};
 
-	if (!platform?.env?.DB) {
+	if (!env.DB) {
 		return empty;
 	}
 
-	const db = getDatabase(platform.env.DB);
+	const db = getDatabase(env.DB);
 	const rows = await db
 		.select()
 		.from(userSettings)
@@ -52,9 +53,9 @@ export const load: PageServerLoad = async ({ locals, platform, request }) => {
 	const row = rows[0];
 
 	let maskedToken = "";
-	if (row?.cloudflareTokenEncrypted && platform.env.TOKEN_ENCRYPTION_KEY) {
+	if (row?.cloudflareTokenEncrypted && env.TOKEN_ENCRYPTION_KEY) {
 		try {
-			const key = await deriveTokenKey(platform.env.TOKEN_ENCRYPTION_KEY);
+			const key = await deriveTokenKey(env.TOKEN_ENCRYPTION_KEY);
 			const blob =
 				row.cloudflareTokenEncrypted instanceof Uint8Array
 					? row.cloudflareTokenEncrypted
@@ -72,9 +73,9 @@ export const load: PageServerLoad = async ({ locals, platform, request }) => {
 	// Model list comes from the KV cache (written on save / by /api/cf/models). The
 	// client can hit /api/cf/models?refresh=1 to refresh on demand.
 	let models: CfModel[] = [];
-	if (accountId && platform.env.AI_QUOTA_KV) {
+	if (accountId && env.AI_QUOTA_KV) {
 		try {
-			const cached = await platform.env.AI_QUOTA_KV.get<{ models?: CfModel[] }>(
+			const cached = await env.AI_QUOTA_KV.get<{ models?: CfModel[] }>(
 				`cf-models:${accountId}`,
 				"json"
 			);
@@ -90,8 +91,8 @@ export const load: PageServerLoad = async ({ locals, platform, request }) => {
 };
 
 export const actions: Actions = {
-	save: async ({ request, locals, platform }) => {
-		if (!locals.user || !platform?.env?.DB) {
+	save: async ({ request, locals }) => {
+		if (!locals.user || !env.DB) {
 			return fail(503, { error: "Service unavailable." });
 		}
 
@@ -100,7 +101,7 @@ export const actions: Actions = {
 		const accountId = (data.get("cloudflareAccountId") ?? "").toString().trim();
 		const model = (data.get("cloudflareModel") ?? "").toString().trim() || DEFAULT_MODEL;
 
-		const db = getDatabase(platform.env.DB);
+		const db = getDatabase(env.DB);
 
 		const existing = await db
 			.select({
@@ -122,12 +123,12 @@ export const actions: Actions = {
 			return fail(400, { error: "Enter your Cloudflare Account ID alongside the API token." });
 		}
 		if (tokenProvided && accountId) {
-			if (!platform.env.TOKEN_ENCRYPTION_KEY) {
+			if (!env.TOKEN_ENCRYPTION_KEY) {
 				return fail(500, { error: "Encryption key not configured." });
 			}
 			try {
 				const models = await listChatModels({ accountId, apiToken: token });
-				await platform.env.AI_QUOTA_KV?.put(
+				await env.AI_QUOTA_KV?.put(
 					`cf-models:${accountId}`,
 					JSON.stringify({ models, cachedAt: Date.now() }),
 					{ expirationTtl: 86400 }
@@ -135,7 +136,7 @@ export const actions: Actions = {
 			} catch (e) {
 				return fail(400, { error: describeCloudflareError(e) });
 			}
-			const key = await deriveTokenKey(platform.env.TOKEN_ENCRYPTION_KEY);
+			const key = await deriveTokenKey(env.TOKEN_ENCRYPTION_KEY);
 			tokenBlob = await encryptToken(token, key);
 		} else if (
 			!tokenProvided &&
@@ -147,18 +148,18 @@ export const actions: Actions = {
 			// Account ID changed but no new token supplied: re-validate the STORED token
 			// against the NEW account before persisting. A scoped token that doesn't work
 			// on the new account is caught here instead of leaving the badge falsely "connected".
-			if (!platform.env.TOKEN_ENCRYPTION_KEY) {
+			if (!env.TOKEN_ENCRYPTION_KEY) {
 				return fail(500, { error: "Encryption key not configured." });
 			}
 			try {
-				const key = await deriveTokenKey(platform.env.TOKEN_ENCRYPTION_KEY);
+				const key = await deriveTokenKey(env.TOKEN_ENCRYPTION_KEY);
 				const blob =
 					row.cloudflareTokenEncrypted instanceof Uint8Array
 						? row.cloudflareTokenEncrypted
 						: new Uint8Array(row.cloudflareTokenEncrypted as ArrayBuffer);
 				const decrypted = await decryptToken(blob, key);
 				const models = await listChatModels({ accountId, apiToken: decrypted });
-				await platform.env.AI_QUOTA_KV?.put(
+				await env.AI_QUOTA_KV?.put(
 					`cf-models:${accountId}`,
 					JSON.stringify({ models, cachedAt: Date.now() }),
 					{ expirationTtl: 86400 }
@@ -189,11 +190,11 @@ export const actions: Actions = {
 		return { success: true };
 	},
 
-	reset: async ({ locals, platform }) => {
-		if (!locals.user || !platform?.env?.DB) {
+	reset: async ({ locals }) => {
+		if (!locals.user || !env.DB) {
 			return fail(503, { error: "Service unavailable." });
 		}
-		const db = getDatabase(platform.env.DB);
+		const db = getDatabase(env.DB);
 		await db.delete(userSettings).where(eq(userSettings.userId, locals.user.id));
 		return { success: true, reset: true };
 	}

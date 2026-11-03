@@ -1,8 +1,8 @@
 import { error } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
-import { requireApiContext, ok } from "$lib/server/api";
-import { getConversation } from "$lib/server/repositories/ai-conversations";
-import { listMessages } from "$lib/server/repositories/ai-messages";
+import { requireApiContext, ok } from "#lib/server/api.js";
+import { getConversation } from "#lib/server/repositories/ai-conversations.js";
+import { listMessages } from "#lib/server/repositories/ai-messages.js";
 
 // GET /api/ai/messages?conversationId=… — lists up to 500 messages for a conversation.
 // Ownership enforced: 404 if the conversation is not the user's. 400 if conversationId missing.

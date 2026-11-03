@@ -3,7 +3,7 @@
 	already open.
 -->
 <script lang="ts">
-	import { ai } from "$lib/stores/ai.svelte";
+	import { ai } from "#lib/stores/ai.svelte.js";
 	import AiLauncherIcon from "./AiLauncherIcon.svelte";
 
 	const hidden = $derived(ai.mobileOpen);

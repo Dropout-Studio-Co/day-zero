@@ -3,11 +3,11 @@
 	with inline Undo for applied+reversible actions.
 -->
 <script lang="ts">
-	import type { AiToolCall } from "$lib/stores/ai.svelte";
-	import { triggerUndo } from "$lib/ai/chat-client";
-	import { toolLabel } from "$lib/ai/tool-labels";
+	import type { AiToolCall } from "#lib/stores/ai.svelte.js";
+	import { triggerUndo } from "#lib/ai/chat-client.js";
+	import { toolLabel } from "#lib/ai/tool-labels.js";
 	import { CheckCircle2, CircleX, Loader2, ShieldAlert, Undo2 } from "@lucide/svelte";
-	import { cn } from "$lib/utils";
+	import { cn } from "#lib/utils.js";
 
 	let { call }: { call: AiToolCall } = $props();
 

@@ -4,10 +4,10 @@
 	a conversation; deleting preserves action history. Rename/delete use native prompt/confirm.
 -->
 <script lang="ts">
-	import { ai } from "$lib/stores/ai.svelte";
-	import { deleteConversation, renameConversation, switchConversation } from "$lib/ai/chat-client";
+	import { ai } from "#lib/stores/ai.svelte.js";
+	import { deleteConversation, renameConversation, switchConversation } from "#lib/ai/chat-client.js";
 	import { Pencil, Trash2 } from "@lucide/svelte";
-	import { cn } from "$lib/utils";
+	import { cn } from "#lib/utils.js";
 
 	const onSwitch = (id: string) => {
 		if (id !== ai.activeConversationId) void switchConversation(id);

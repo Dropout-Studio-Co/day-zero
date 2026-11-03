@@ -1,19 +1,21 @@
+import type { Handle, HandleServerError } from "@sveltejs/kit/hooks";
+
 /**
  * SvelteKit server hooks. Owns request-scoped auth resolution and response hardening.
  * - `handle`: per-request — instantiates Better Auth, resolves session into event.locals
  *   (user/session/currentUser), delegates Better Auth's own routes, and stamps security
  *   headers (CSP etc.) on EVERY response.
  * - `handleError`: server error → UUID-correlated log + sanitized App.Error.
- * Graceful degradation: if D1 (event.platform.env.DB) is absent, auth is silently disabled
+ * Graceful degradation: if D1 (event.env.DB) is absent, auth is silently disabled
  * and every request is treated as unauthenticated (locals nulled).
  */
-import type { Handle, HandleServerError } from "@sveltejs/kit";
 import { svelteKitHandler } from "better-auth/svelte-kit";
-import { building } from "$app/environment";
+import { building } from "$app/env";
 import { drizzle } from "drizzle-orm/d1";
-import { createAuth } from "$lib/server/auth";
-import { users } from "$lib/server/schema";
-import { getCurrentUser } from "$lib/hooks";
+import { createAuth } from "#lib/server/auth.js";
+import { users } from "#lib/server/schema.js";
+import { getCurrentUser } from "#lib/hooks/index.js";
+import { env } from "cloudflare:workers";
 
 // Google One Tap loads the GSI script + renders a FedCM iframe from accounts.google.com,
 // so script-src/style-src/frame-src must allow it. Passkey/WebAuthn needs no CSP change.
@@ -68,7 +70,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return resolve(event);
 	}
 
-	const db = event.platform?.env?.DB;
+	const db = env.DB;
 
 	if (!db) {
 		console.warn("D1 database not available - auth disabled");
@@ -80,10 +82,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// AI_COPILOT_ENABLED kill switch — enforced server-side (not just in the UI) for
 	// every /api/ai/* handler at one chokepoint, so the copilot truly stops when off.
-	if (
-		event.url.pathname.startsWith("/api/ai/") &&
-		event.platform?.env?.AI_COPILOT_ENABLED === "false"
-	) {
+	if (event.url.pathname.startsWith("/api/ai/") && env.AI_COPILOT_ENABLED === "false") {
 		return new Response(JSON.stringify({ code: "ai_disabled", error: "AI Copilot is disabled" }), {
 			status: 503,
 			headers: { "content-type": "application/json" }
@@ -102,7 +101,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// The user row is upserted (onConflictDoNothing) so FK-bound app data has a real owner.
 	// MUST NEVER be enabled in production — it grants full unauthenticated access.
 	const isLocalDev = event.url.hostname === "localhost" || event.url.hostname === "127.0.0.1";
-	if (isLocalDev && event.platform?.env?.E2E_BYPASS_AUTH === "true") {
+	if (isLocalDev && env.E2E_BYPASS_AUTH === "true") {
 		const now = new Date();
 		const userId = "e2e-test-user";
 		const dz = drizzle(db);
@@ -141,14 +140,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return applySecurityHeaders(await resolve(event));
 	}
 
-	const env = {
-		BETTER_AUTH_SECRET: event.platform?.env?.BETTER_AUTH_SECRET ?? "",
-		BETTER_AUTH_URL: event.platform?.env?.BETTER_AUTH_URL ?? "http://localhost:5173",
-		GOOGLE_CLIENT_ID: event.platform?.env?.GOOGLE_CLIENT_ID ?? "",
-		GOOGLE_CLIENT_SECRET: event.platform?.env?.GOOGLE_CLIENT_SECRET ?? ""
+	const authEnv = {
+		BETTER_AUTH_SECRET: env.BETTER_AUTH_SECRET ?? "",
+		BETTER_AUTH_URL: env.BETTER_AUTH_URL ?? "http://localhost:5173",
+		GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID ?? "",
+		GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET ?? ""
 	};
 
-	const auth = createAuth(db, env);
+	const auth = createAuth(db, authEnv);
 
 	// A getSession failure must not 500 the whole app — treat as unauthenticated instead.
 	try {
@@ -177,14 +176,21 @@ export const handle: Handle = async ({ event, resolve }) => {
 };
 
 /**
- * Server error hook. Logs the error with a UUID + request method/path/stack, returns the
- * same UUID plus a sanitized message (generic for 5xx, passthrough for <500) as App.Error.
+ * Server error hook. SvelteKit 3 routes every error here — app errors from `error(...)`,
+ * framework errors (404s and the like), remote-function validation errors, and unknown
+ * throws — discriminated by `kind`. Logs the error with a UUID plus request
+ * method/path/stack and returns that UUID with a message that never leaks internals for
+ * unknown errors; app and framework errors keep their own safe messages (and statuses).
  */
-export const handleError: HandleServerError = async ({ error, event, status, message }) => {
+export const handleError: HandleServerError = async ({ kind, error, event }) => {
 	const errorId = crypto.randomUUID();
+	const message =
+		kind === "unknown"
+			? "An unexpected error occurred"
+			: ((error as { message?: string }).message ?? "An unexpected error occurred");
 
 	console.error(`[${errorId}] Unhandled error:`, {
-		status,
+		kind,
 		message,
 		url: event.url.pathname,
 		method: event.request.method,
@@ -194,8 +200,5 @@ export const handleError: HandleServerError = async ({ error, event, status, mes
 				: error
 	});
 
-	return {
-		message: status >= 500 ? "An unexpected error occurred" : message,
-		errorId
-	};
+	return { message, errorId };
 };

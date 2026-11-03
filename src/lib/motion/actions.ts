@@ -7,11 +7,11 @@
  * killed on destroy (and `cancelled` guards the in-flight async load).
  */
 import type { Action } from "svelte/action";
-import { getGsap } from "$lib/motion/gsap";
-import { prefersReducedMotion } from "$lib/motion/reduced-motion.svelte";
-import { DURATION, EASE, DISTANCE } from "$lib/motion/tokens";
-import type { DurationToken, DistanceToken } from "$lib/motion/tokens";
-import { isNavigating } from "$lib/motion/view-transition";
+import { getGsap } from "#lib/motion/gsap.js";
+import { prefersReducedMotion } from "#lib/motion/reduced-motion.svelte.js";
+import { DURATION, EASE, DISTANCE } from "#lib/motion/tokens.js";
+import type { DurationToken, DistanceToken } from "#lib/motion/tokens.js";
+import { isNavigating } from "#lib/motion/view-transition.js";
 
 export interface RevealParams {
 	onScroll?: boolean;

@@ -5,7 +5,7 @@
 	`sleek border-hair bg-card` treatment so the corner reads consistently either way.
 -->
 <script lang="ts">
-	import { cn } from "$lib/utils";
+	import { cn } from "#lib/utils.js";
 	import { CloudUpload } from "@lucide/svelte";
 </script>
 

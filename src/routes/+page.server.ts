@@ -1,14 +1,15 @@
 import type { PageServerLoad } from "./$types";
-import { getDatabase } from "$lib/server/db";
-import { loadAppState } from "$lib/server/repositories/state";
-import type { AppState } from "$lib/server/dto";
+import { getDatabase } from "#lib/server/db.js";
+import { loadAppState } from "#lib/server/repositories/state.js";
+import type { AppState } from "#lib/server/dto.js";
 import {
 	getMostRecentConversation,
 	listConversations
-} from "$lib/server/repositories/ai-conversations";
-import { listMessages } from "$lib/server/repositories/ai-messages";
-import { listRecent } from "$lib/server/repositories/ai-actions";
-import type { AiHydrationPayload } from "$lib/stores/ai.svelte";
+} from "#lib/server/repositories/ai-conversations.js";
+import { listMessages } from "#lib/server/repositories/ai-messages.js";
+import { listRecent } from "#lib/server/repositories/ai-actions.js";
+import type { AiHydrationPayload } from "#lib/stores/ai.svelte.js";
+import { env } from "cloudflare:workers";
 
 // Zero-state AI payload used when AI is disabled or D1/user is unavailable.
 const emptyAi = (enabled: boolean): AiHydrationPayload => ({
@@ -31,9 +32,9 @@ const emptyAi = (enabled: boolean): AiHydrationPayload => ({
  * action timestamps are serialized to ISO strings here because the wire payload
  * must be JSON-safe (Date does not survive load → client).
  */
-export const load: PageServerLoad = async ({ locals, platform }) => {
-	const d1 = platform?.env?.DB;
-	const aiEnabled = platform?.env?.AI_COPILOT_ENABLED !== "false";
+export const load: PageServerLoad = async ({ locals }) => {
+	const d1 = env.DB;
+	const aiEnabled = env.AI_COPILOT_ENABLED !== "false";
 	let appState: AppState = { countdowns: [] };
 	let ai: AiHydrationPayload = emptyAi(aiEnabled);
 

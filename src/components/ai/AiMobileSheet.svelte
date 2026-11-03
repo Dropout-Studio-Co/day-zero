@@ -5,7 +5,7 @@
 <script lang="ts">
 	import { fade, fly } from "svelte/transition";
 	import { tick } from "svelte";
-	import { ai } from "$lib/stores/ai.svelte";
+	import { ai } from "#lib/stores/ai.svelte.js";
 	import { X } from "@lucide/svelte";
 	import AiSidebar from "./AiSidebar.svelte";
 

@@ -12,7 +12,7 @@ import { and, eq, sql } from "drizzle-orm";
 import type { Database } from "./db";
 import { countdowns } from "./schema";
 import { toCountdown } from "./dto";
-import type { Countdown } from "$lib/types";
+import type { Countdown } from "#lib/types.js";
 import {
 	update as updateCountdownRepo,
 	remove as removeCountdownRepo,

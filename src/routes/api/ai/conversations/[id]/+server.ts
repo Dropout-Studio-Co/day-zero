@@ -1,8 +1,11 @@
 import { error } from "@sveltejs/kit";
 import { z } from "zod";
 import type { RequestHandler } from "./$types";
-import { requireApiContext, parseJson, ok } from "$lib/server/api";
-import { deleteConversation, renameConversation } from "$lib/server/repositories/ai-conversations";
+import { requireApiContext, parseJson, ok } from "#lib/server/api.js";
+import {
+	deleteConversation,
+	renameConversation
+} from "#lib/server/repositories/ai-conversations.js";
 
 // Single AI conversation. PATCH renames (404 if not owned/found); DELETE removes it
 // (idempotent, no 404). Both user-scoped via requireApiContext; 400 if id missing.

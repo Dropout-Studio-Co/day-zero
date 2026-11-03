@@ -4,7 +4,7 @@
 	shadcn primitive) — the sole editable file under ui/. All links/hrefs preserved.
 -->
 <script lang="ts">
-	import { APP_CONFIG } from "$lib/config/app";
+	import { APP_CONFIG } from "#lib/config/app.js";
 </script>
 
 <footer

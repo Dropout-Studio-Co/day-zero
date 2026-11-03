@@ -10,8 +10,8 @@
  * browser only — do not import from a server route. @see ./executor.ts (caller).
  */
 
-import { countdowns } from "$lib/stores/countdowns.svelte";
-import type { Countdown } from "$lib/types";
+import { countdowns } from "#lib/stores/countdowns.svelte.js";
+import type { Countdown } from "#lib/types.js";
 import {
 	inverseForCreateCountdown,
 	inverseForDeleteCountdown,

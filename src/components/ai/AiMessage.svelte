@@ -4,11 +4,11 @@
 	wave placeholder before content arrives and any AiToolBadge calls below the bubble.
 -->
 <script lang="ts">
-	import type { AiMessage } from "$lib/stores/ai.svelte";
-	import type { MdBlock, MdInline } from "$lib/ai/markdown";
-	import { parseMarkdown, sanitizeAssistantText } from "$lib/ai/markdown";
+	import type { AiMessage } from "#lib/stores/ai.svelte.js";
+	import type { MdBlock, MdInline } from "#lib/ai/markdown.js";
+	import { parseMarkdown, sanitizeAssistantText } from "#lib/ai/markdown.js";
 	import AiToolBadge from "./AiToolBadge.svelte";
-	import { cn } from "$lib/utils";
+	import { cn } from "#lib/utils.js";
 
 	let { message }: { message: AiMessage } = $props();
 

@@ -19,9 +19,9 @@
 	with non-overlapping properties).
 -->
 <script lang="ts">
-	import { clock } from "$lib/stores/clock.svelte";
-	import { remaining, humanize, pad2 } from "$lib/countdown/format";
-	import { cn } from "$lib/utils";
+	import { clock } from "#lib/stores/clock.svelte.js";
+	import { remaining, humanize, pad2 } from "#lib/countdown/format.js";
+	import { cn } from "#lib/utils.js";
 
 	type Size = "hero" | "card" | "share";
 

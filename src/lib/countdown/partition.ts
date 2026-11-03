@@ -3,7 +3,7 @@
  * hero/upcoming/past rules and the reorder merge are unit-testable without runes.
  * `now` is passed in (never read here), keeping the derived board deterministic.
  */
-import type { Countdown } from "$lib/types";
+import type { Countdown } from "#lib/types.js";
 
 export interface BoardPartition {
 	/** Future targets, soonest first (the grid). */

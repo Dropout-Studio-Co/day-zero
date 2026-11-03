@@ -6,8 +6,8 @@
  * @see ./prompts.ts buildUserTurn (embeds summaryText), src/routes/api/ai/chat/+server.ts.
  */
 
-import type { AppState } from "$lib/server/dto";
-import type { Countdown } from "$lib/types";
+import type { AppState } from "#lib/server/dto.js";
+import type { Countdown } from "#lib/types.js";
 
 export interface ContextPayload {
 	summaryText: string;

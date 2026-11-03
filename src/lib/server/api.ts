@@ -1,10 +1,11 @@
 /**
  * Shared request helpers for /api/* route handlers: auth+DB gate, body validation, responses.
  */
-import { error, json } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import type { RequestEvent } from "@sveltejs/kit";
 import { z } from "zod";
 import { getDatabase, type Database } from "./db";
+import { env } from "cloudflare:workers";
 
 export interface ApiContext {
 	db: Database;
@@ -22,7 +23,7 @@ export const requireApiContext = (event: RequestEvent): ApiContext => {
 		throw error(401, "Unauthorized");
 	}
 
-	const d1 = event.platform?.env?.DB;
+	const d1 = env.DB;
 	if (!d1) {
 		throw error(503, "Database unavailable");
 	}
@@ -53,4 +54,4 @@ export const parseJson = async <T extends z.ZodTypeAny>(
 
 /** Standard success response: 204 (empty body) when data is omitted, else 200 JSON. */
 export const ok = <T>(data?: T) =>
-	data === undefined ? new Response(null, { status: 204 }) : json(data);
+	data === undefined ? new Response(null, { status: 204 }) : Response.json(data);

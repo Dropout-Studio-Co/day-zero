@@ -8,7 +8,7 @@
 import { and, asc, eq, max, sql } from "drizzle-orm";
 import type { Database } from "../db";
 import { countdowns } from "../schema";
-import type { Countdown, CountdownInput, CountdownPatch, PublicCountdown } from "$lib/types";
+import type { Countdown, CountdownInput, CountdownPatch, PublicCountdown } from "#lib/types.js";
 import { toCountdown, toPublicCountdown } from "../dto";
 
 const nextPosition = async (db: Database, userId: string): Promise<number> => {

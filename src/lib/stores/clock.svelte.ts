@@ -8,7 +8,7 @@
  * first tick. The momentary SSR/client value difference is patched by Svelte on
  * hydration (text content), which is expected for a live clock.
  */
-import { browser } from "$app/environment";
+import { browser } from "$app/env";
 
 const createClock = () => {
 	let now = $state(Date.now());

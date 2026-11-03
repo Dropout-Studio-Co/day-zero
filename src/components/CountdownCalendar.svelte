@@ -15,7 +15,7 @@
 	import { Calendar as CalendarPrimitive } from "bits-ui";
 	import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
 	import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
-	import { cn } from "$lib/ds";
+	import { cn } from "#lib/ds/index.js";
 	import type { DateValue } from "@internationalized/date";
 
 	let {

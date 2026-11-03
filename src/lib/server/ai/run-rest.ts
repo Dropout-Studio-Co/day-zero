@@ -92,7 +92,7 @@ interface RawChatEnvelope {
 
 /**
  * Collapses either response envelope into the native `{ response, tool_calls, usage }`
- * the chat parser (`$lib/ai/client.ts`) reads. Prefers the native top-level fields
+ * the chat parser (`#lib/ai/client.ts`) reads. Prefers the native top-level fields
  * (llama/mistral); otherwise lifts them from `choices[0].message` (kimi & other
  * OpenAI-only models), mapping OpenAI `tool_calls[].function` -> `{ name, arguments }`.
  * Without this, kimi turns (choices-only) would surface no text and no tool calls.

@@ -11,10 +11,14 @@
  */
 
 import type { Frame, ParsedToolCall, ToolCatalogEntry } from "./types";
-import { runChatViaRest, type ChatRestInput, type CloudflareCreds } from "$lib/server/ai/run-rest";
+import {
+	runChatViaRest,
+	type ChatRestInput,
+	type CloudflareCreds
+} from "#lib/server/ai/run-rest.js";
 
 /** Re-export the default model id so callers fall back to it consistently. */
-export { DEFAULT_MODEL as MODEL } from "$lib/server/ai/run-rest";
+export { DEFAULT_MODEL as MODEL } from "#lib/server/ai/run-rest.js";
 
 export interface RunChatParams {
 	creds: CloudflareCreds;

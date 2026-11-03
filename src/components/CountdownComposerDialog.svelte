@@ -11,16 +11,16 @@
 	every band clips to the rounded corners.
 -->
 <script lang="ts">
-	import * as Dialog from "$lib/components/ui/dialog";
-	import * as Select from "$lib/components/ui/select";
-	import { Switch } from "$lib/components/ui/switch";
+	import * as Dialog from "#lib/components/ui/dialog/index.js";
+	import * as Select from "#lib/components/ui/select/index.js";
+	import { Switch } from "#lib/components/ui/switch/index.js";
 	import CountdownCalendar from "$src/components/CountdownCalendar.svelte";
-	import { Input, Cta, cn, inputBase, labelBase } from "$lib/ds";
-	import { formatTargetDate } from "$lib/countdown/format";
-	import { buildTargetIso, parseTargetIso } from "$lib/countdown/time";
-	import { lockScroll } from "$lib/hooks";
+	import { Input, Cta, cn, inputBase, labelBase } from "#lib/ds/index.js";
+	import { formatTargetDate } from "#lib/countdown/format.js";
+	import { buildTargetIso, parseTargetIso } from "#lib/countdown/time.js";
+	import { lockScroll } from "#lib/hooks/index.js";
 	import { CalendarDate, getLocalTimeZone, today, type DateValue } from "@internationalized/date";
-	import type { Countdown, CountdownInput } from "$lib/types";
+	import type { Countdown, CountdownInput } from "#lib/types.js";
 
 	let {
 		open = $bindable(false),

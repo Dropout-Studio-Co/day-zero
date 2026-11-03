@@ -1,9 +1,9 @@
 import { z } from "zod";
 import type { RequestHandler } from "./$types";
-import { requireApiContext, parseJson, ok } from "$lib/server/api";
-import { insertAction, listRecent } from "$lib/server/repositories/ai-actions";
-import { validateInverse } from "$lib/server/ai-undo";
-import { logToolExecution } from "$lib/server/log";
+import { requireApiContext, parseJson, ok } from "#lib/server/api.js";
+import { insertAction, listRecent } from "#lib/server/repositories/ai-actions.js";
+import { validateInverse } from "#lib/server/ai-undo.js";
+import { logToolExecution } from "#lib/server/log.js";
 
 /**
  * AI action history collection.

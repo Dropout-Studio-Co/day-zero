@@ -1,4 +1,5 @@
 import type { LayoutServerLoad } from "./$types";
+import { env } from "cloudflare:workers";
 
 /**
  * Root layout load. Surfaces the client-safe auth identity populated by `hooks.server.ts`
@@ -7,10 +8,10 @@ import type { LayoutServerLoad } from "./$types";
  * `locals.session` is intentionally NOT returned: it carries the session token, which must never be
  * serialized into the page hydration payload — the token belongs only in the httpOnly cookie.
  */
-export const load: LayoutServerLoad = async ({ locals, platform }) => {
+export const load: LayoutServerLoad = async ({ locals }) => {
 	return {
 		user: locals.user,
 		currentUser: locals.currentUser,
-		aiEnabled: platform?.env?.AI_COPILOT_ENABLED !== "false"
+		aiEnabled: env.AI_COPILOT_ENABLED !== "false"
 	};
 };

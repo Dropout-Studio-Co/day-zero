@@ -10,12 +10,12 @@
 <script lang="ts">
 	import { untrack, onMount } from "svelte";
 	import { page } from "$app/state";
-	import { countdowns } from "$lib/stores/countdowns.svelte";
-	import { ai } from "$lib/stores/ai.svelte";
-	import { cn } from "$lib/utils";
-	import { reveal } from "$lib/motion";
-	import { Cta } from "$lib/ds";
-	import Heading from "$lib/components/ui/heading/heading.svelte";
+	import { countdowns } from "#lib/stores/countdowns.svelte.js";
+	import { ai } from "#lib/stores/ai.svelte.js";
+	import { cn } from "#lib/utils.js";
+	import { reveal } from "#lib/motion/index.js";
+	import { Cta } from "#lib/ds/index.js";
+	import Heading from "#lib/components/ui/heading/heading.svelte";
 	import Navbar from "$src/components/Navbar.svelte";
 	import User from "$src/components/User.svelte";
 	import SignInButton from "$src/components/SignInButton.svelte";
@@ -24,7 +24,7 @@
 	import EmptyState from "$src/components/EmptyState.svelte";
 	import CountdownComposerDialog from "$src/components/CountdownComposerDialog.svelte";
 	import ShareDialog from "$src/components/ShareDialog.svelte";
-	import type { Countdown, CountdownInput } from "$lib/types";
+	import type { Countdown, CountdownInput } from "#lib/types.js";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();

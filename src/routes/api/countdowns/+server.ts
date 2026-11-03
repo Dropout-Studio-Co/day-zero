@@ -1,8 +1,8 @@
 /** Collection endpoints for countdowns: list, create, reorder. All userId-scoped. */
 import type { RequestHandler } from "./$types";
-import { requireApiContext, parseJson, ok } from "$lib/server/api";
-import { createCountdownSchema, reorderSchema } from "$lib/server/validation";
-import { listByUser, create, reorder } from "$lib/server/repositories/countdowns";
+import { requireApiContext, parseJson, ok } from "#lib/server/api.js";
+import { createCountdownSchema, reorderSchema } from "#lib/server/validation.js";
+import { listByUser, create, reorder } from "#lib/server/repositories/countdowns.js";
 
 export const GET: RequestHandler = async (event) => {
 	const { db, userId } = requireApiContext(event);

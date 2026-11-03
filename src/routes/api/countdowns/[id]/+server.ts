@@ -1,9 +1,9 @@
 /** Single-countdown endpoints: partial update, delete. All userId-scoped. */
 import { error } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
-import { requireApiContext, parseJson, ok } from "$lib/server/api";
-import { updateCountdownSchema } from "$lib/server/validation";
-import { update, remove } from "$lib/server/repositories/countdowns";
+import { requireApiContext, parseJson, ok } from "#lib/server/api.js";
+import { updateCountdownSchema } from "#lib/server/validation.js";
+import { update, remove } from "#lib/server/repositories/countdowns.js";
 
 export const PATCH: RequestHandler = async (event) => {
 	const { db, userId } = requireApiContext(event);

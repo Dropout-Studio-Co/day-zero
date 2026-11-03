@@ -11,7 +11,7 @@
  * Writes are synchronous (not debounced) — localStorage is local and cheap;
  * callers that need throttling already debounce upstream.
  */
-import { browser } from "$app/environment";
+import { browser } from "$app/env";
 
 export const readLocal = <T>(key: string): T | null => {
 	if (!browser) return null;

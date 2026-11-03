@@ -5,12 +5,12 @@
 	owned by the navbar, not here.
 -->
 <script lang="ts">
-	import { authClient } from "$lib/auth-client";
-	import { cn } from "$lib/utils";
-	import * as Tooltip from "$lib/components/ui/tooltip";
-	import { IconButton } from "$lib/ds";
+	import { authClient } from "#lib/auth-client.js";
+	import { cn } from "#lib/utils.js";
+	import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+	import { IconButton } from "#lib/ds/index.js";
 	import { Power, Settings, User } from "@lucide/svelte";
-	import type { CurrentUser } from "$lib/types";
+	import type { CurrentUser } from "#lib/types.js";
 
 	interface Props {
 		user: {

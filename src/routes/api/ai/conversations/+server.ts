@@ -1,8 +1,11 @@
 import { z } from "zod";
 import type { RequestHandler } from "./$types";
-import { requireApiContext, parseJson, ok } from "$lib/server/api";
-import { createConversation, listConversations } from "$lib/server/repositories/ai-conversations";
-import { titleFromMessage } from "$lib/ai/prompts";
+import { requireApiContext, parseJson, ok } from "#lib/server/api.js";
+import {
+	createConversation,
+	listConversations
+} from "#lib/server/repositories/ai-conversations.js";
+import { titleFromMessage } from "#lib/ai/prompts.js";
 
 // AI conversations collection. GET lists the user's 50 most recent conversations;
 // POST creates one (optional title, else derived from a placeholder). Auth + D1 via requireApiContext.

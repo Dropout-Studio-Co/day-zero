@@ -3,8 +3,8 @@
 	inserts a newline. Exposes setValue() so AiWelcome suggestion cards can prefill the box.
 -->
 <script lang="ts">
-	import { ai } from "$lib/stores/ai.svelte";
-	import { cn } from "$lib/utils";
+	import { ai } from "#lib/stores/ai.svelte.js";
+	import { cn } from "#lib/utils.js";
 	import { ArrowUp } from "@lucide/svelte";
 	import { tick } from "svelte";
 

@@ -7,8 +7,8 @@
 -->
 <script lang="ts">
 	import type { Snippet } from "svelte";
-	import { cn } from "$lib/utils";
-	import { ai } from "$lib/stores/ai.svelte";
+	import { cn } from "#lib/utils.js";
+	import { ai } from "#lib/stores/ai.svelte.js";
 
 	let { children }: { children: Snippet } = $props();
 

@@ -8,8 +8,8 @@
  * @see $lib/ai/chat-client.ts (primary mutator).
  */
 
-import { api, sync } from "$lib/api/client";
-import type { ConfirmationDiffRow, ParsedToolCall, SafetyTier } from "$lib/ai/types";
+import { api, sync } from "#lib/api/client.js";
+import type { ConfirmationDiffRow, ParsedToolCall, SafetyTier } from "#lib/ai/types.js";
 
 export type AiMessageRole = "user" | "assistant" | "tool" | "system";
 

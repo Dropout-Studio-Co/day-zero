@@ -9,9 +9,9 @@
  * @see ./executor.ts, $lib/stores/ai.svelte.ts, src/routes/api/ai/*.
  */
 
-import { ai } from "$lib/stores/ai.svelte";
-import { countdowns } from "$lib/stores/countdowns.svelte";
-import type { Countdown } from "$lib/types";
+import { ai } from "#lib/stores/ai.svelte.js";
+import { countdowns } from "#lib/stores/countdowns.svelte.js";
+import type { Countdown } from "#lib/types.js";
 import { executeToolCall, type ConfirmationRequest, type ExecutionFrame } from "./executor";
 import { streamFrames } from "./streaming";
 import { friendlyErrorMessage } from "./errors";

@@ -4,15 +4,15 @@
 	mobile sheet. Status dot derives from store error/busy/streaming flags.
 -->
 <script lang="ts">
-	import { ai } from "$lib/stores/ai.svelte";
-	import { createNewConversation, sendMessage } from "$lib/ai/chat-client";
+	import { ai } from "#lib/stores/ai.svelte.js";
+	import { createNewConversation, sendMessage } from "#lib/ai/chat-client.js";
 	import AiHeader from "./AiHeader.svelte";
 	import AiWelcome from "./AiWelcome.svelte";
 	import AiMessageList from "./AiMessageList.svelte";
 	import AiComposer from "./AiComposer.svelte";
 	import AiConversationsPanel from "./AiConversationsPanel.svelte";
 	import { ArrowRight } from "@lucide/svelte";
-	import { cn } from "$lib/utils";
+	import { cn } from "#lib/utils.js";
 
 	let {
 		bare = false,

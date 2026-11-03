@@ -15,9 +15,9 @@
 	import { fly } from "svelte/transition";
 	import { page } from "$app/state";
 	import { onNavigate } from "$app/navigation";
-	import { handleViewTransition, motionDuration } from "$lib/motion";
-	import { ai } from "$lib/stores/ai.svelte";
-	import { Footer } from "$lib/components/ui/footer";
+	import { handleViewTransition, motionDuration } from "#lib/motion/index.js";
+	import { ai } from "#lib/stores/ai.svelte.js";
+	import { Footer } from "#lib/components/ui/footer/index.js";
 	import AiSidebar from "$src/components/ai/AiSidebar.svelte";
 	import AiConfirmDialog from "$src/components/ai/AiConfirmDialog.svelte";
 	import AiDesktopLauncher from "$src/components/ai/AiDesktopLauncher.svelte";

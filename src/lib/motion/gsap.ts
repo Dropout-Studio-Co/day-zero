@@ -8,8 +8,8 @@
  * touches window/document at module-eval time, which breaks SSR on Cloudflare
  * Workers. Returns null on the server.
  */
-import { browser } from "$app/environment";
-import { DURATION, EASE } from "$lib/motion/tokens";
+import { browser } from "$app/env";
+import { DURATION, EASE } from "#lib/motion/tokens.js";
 
 type GsapModule = (typeof import("gsap"))["gsap"];
 type ScrollTriggerModule = (typeof import("gsap/ScrollTrigger"))["ScrollTrigger"];

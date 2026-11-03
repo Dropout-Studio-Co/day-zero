@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
 	import { CalendarPlus, Timer, Trophy, HelpCircle } from "@lucide/svelte";
-	import { Heading } from "$lib/ds";
+	import { Heading } from "#lib/ds/index.js";
 
 	let {
 		onSuggestionClick

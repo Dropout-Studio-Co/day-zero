@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
-import { requireApiContext, ok } from "$lib/server/api";
-import { deleteAction } from "$lib/server/repositories/ai-actions";
+import { requireApiContext, ok } from "#lib/server/api.js";
+import { deleteAction } from "#lib/server/repositories/ai-actions.js";
 
 // DELETE /api/ai/actions/[id] — removes a recorded action (user-scoped). 400 if id missing.
 export const DELETE: RequestHandler = async (event) => {

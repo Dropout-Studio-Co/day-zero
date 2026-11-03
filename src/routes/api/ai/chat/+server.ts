@@ -1,39 +1,40 @@
-import { error, json } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import { z } from "zod";
 import type { RequestHandler } from "./$types";
-import { requireApiContext } from "$lib/server/api";
-import { loadAppState } from "$lib/server/repositories/state";
+import { requireApiContext } from "#lib/server/api.js";
+import { loadAppState } from "#lib/server/repositories/state.js";
 import {
 	createConversation,
 	getConversation,
 	touchUpdatedAt
-} from "$lib/server/repositories/ai-conversations";
+} from "#lib/server/repositories/ai-conversations.js";
 import {
 	appendMessage,
 	listMessages,
 	type AiMessageRow,
 	type AiMessageToolCall
-} from "$lib/server/repositories/ai-messages";
-import { checkAndIncrementQuota } from "$lib/server/ai-quota";
-import { checkSpendCap, recordSpend } from "$lib/server/ai-spend";
-import { logChatTurn } from "$lib/server/log";
-import { projectAppState } from "$lib/ai/context";
+} from "#lib/server/repositories/ai-messages.js";
+import { checkAndIncrementQuota } from "#lib/server/ai-quota.js";
+import { checkSpendCap, recordSpend } from "#lib/server/ai-spend.js";
+import { logChatTurn } from "#lib/server/log.js";
+import { projectAppState } from "#lib/ai/context.js";
 import {
 	buildSystemContext,
 	buildUserTurn,
 	titleFromMessage,
 	PROMPT_VERSION,
 	FEW_SHOTS
-} from "$lib/ai/prompts";
-import { runChatFrames, type RawChatResult } from "$lib/ai/client";
-import { loadCloudflareConfig, resolveCloudflareCreds } from "$lib/server/ai/cloudflare-config";
-import type { CloudflareCreds } from "$lib/server/ai/run-rest";
-import { salvageTextToolCalls } from "$lib/ai/salvage";
-import { sseStream } from "$lib/ai/streaming";
-import { TOOLS_CATALOG } from "$lib/ai/tools-catalog";
-import { toolLabel } from "$lib/ai/tool-labels";
-import { argSchemas, isKnownToolName } from "$lib/ai/schemas";
-import type { Frame, ParsedToolCall } from "$lib/ai/types";
+} from "#lib/ai/prompts.js";
+import { runChatFrames, type RawChatResult } from "#lib/ai/client.js";
+import { loadCloudflareConfig, resolveCloudflareCreds } from "#lib/server/ai/cloudflare-config.js";
+import type { CloudflareCreds } from "#lib/server/ai/run-rest.js";
+import { salvageTextToolCalls } from "#lib/ai/salvage.js";
+import { sseStream } from "#lib/ai/streaming.js";
+import { TOOLS_CATALOG } from "#lib/ai/tools-catalog.js";
+import { toolLabel } from "#lib/ai/tool-labels.js";
+import { argSchemas, isKnownToolName } from "#lib/ai/schemas.js";
+import type { Frame, ParsedToolCall } from "#lib/ai/types.js";
+import { env } from "cloudflare:workers";
 
 const bodySchema = z.object({
 	conversationId: z.string().nullable().optional(),
@@ -141,10 +142,6 @@ const AFFIRMATION_RE =
 export const POST: RequestHandler = async (event) => {
 	const start = Date.now();
 	const { db, userId } = requireApiContext(event);
-	const env = event.platform?.env;
-	if (!env) {
-		throw error(503, "Platform unavailable");
-	}
 
 	let parsed: z.infer<typeof bodySchema>;
 	try {
@@ -163,7 +160,7 @@ export const POST: RequestHandler = async (event) => {
 			)
 		: null;
 	if (!resolved) {
-		return json(
+		return Response.json(
 			{
 				code: "cloudflare_not_connected",
 				error: "Connect your Cloudflare account in Settings to use the copilot.",
@@ -179,7 +176,7 @@ export const POST: RequestHandler = async (event) => {
 	// so a turn rejected by the cap does not burn a daily quota unit.
 	const spend = await checkSpendCap(env.AI_QUOTA_KV, userId, env.AI_MONTHLY_CAP_USD);
 	if (!spend.allowed) {
-		return json(
+		return Response.json(
 			{
 				code: "spend_cap_reached",
 				message: `Monthly AI spend cap reached ($${spend.spentUsd.toFixed(2)} of $${spend.capUsd.toFixed(2)}). Resets at the start of next month.`
@@ -190,7 +187,7 @@ export const POST: RequestHandler = async (event) => {
 
 	const quota = await checkAndIncrementQuota(env.AI_QUOTA_KV, userId);
 	if (!quota.allowed) {
-		return json(
+		return Response.json(
 			{
 				code: "quota_exceeded",
 				message: `Daily AI quota reached (${quota.count}/${quota.limit}). Resets at ${quota.resetsAt}.`,

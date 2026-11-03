@@ -3,7 +3,7 @@
 	one bright thing on the page.
 -->
 <script lang="ts">
-	import { Heading, Cta } from "$lib/ds";
+	import { Heading, Cta } from "#lib/ds/index.js";
 
 	let { onNew }: { onNew: () => void } = $props();
 </script>

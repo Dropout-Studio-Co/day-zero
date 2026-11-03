@@ -7,9 +7,9 @@
 	Heading header, hairline date separators, monochrome throughout.
 -->
 <script lang="ts">
-	import { CHANGELOG_ENTRIES, type ChangelogEntry } from "$lib/data/changelog";
-	import { reveal } from "$lib/motion";
-	import { Heading, Eyebrow } from "$lib/ds";
+	import { CHANGELOG_ENTRIES, type ChangelogEntry } from "#lib/data/changelog.js";
+	import { reveal } from "#lib/motion/index.js";
+	import { Heading, Eyebrow } from "#lib/ds/index.js";
 
 	type DateGroup = { date: string; label: string; entries: ChangelogEntry[] };
 

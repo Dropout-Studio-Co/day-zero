@@ -10,8 +10,8 @@
  * @see ./tools.ts (executors), ./inverse.ts (inverse builders), $lib/stores/ai.svelte.ts.
  */
 
-import { api } from "$lib/api/client";
-import { countdowns } from "$lib/stores/countdowns.svelte";
+import { api } from "#lib/api/client.js";
+import { countdowns } from "#lib/stores/countdowns.svelte.js";
 import { executors } from "./tools";
 import { argSchemas, isKnownToolName, type ArgsOf } from "./schemas";
 import { TIER_MAP } from "./tools-catalog";

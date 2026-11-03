@@ -6,7 +6,7 @@
 <script lang="ts">
 	import { page } from "$app/state";
 	import { resolve } from "$app/paths";
-	import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
+	import { Card, CardContent, CardHeader, CardTitle } from "#lib/components/ui/card/index.js";
 	import { ArrowLeft, TriangleAlert } from "@lucide/svelte";
 </script>
 

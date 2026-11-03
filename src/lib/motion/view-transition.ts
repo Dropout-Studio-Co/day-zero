@@ -1,3 +1,5 @@
+import type { OnNavigate } from "$app/navigation";
+
 /**
  * Cross-route View Transitions, wired via `onNavigate` in +layout.svelte.
  * Falls back gracefully (just awaits navigation, no transition) when the View
@@ -7,8 +9,7 @@
  * animations like `use:reveal` suppress themselves mid-navigation so they don't
  * double up with the page transition.
  */
-import type { OnNavigate } from "@sveltejs/kit";
-import { prefersReducedMotion } from "$lib/motion/reduced-motion.svelte";
+import { prefersReducedMotion } from "#lib/motion/reduced-motion.svelte.js";
 
 let navigating = false;
 

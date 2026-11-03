@@ -16,11 +16,11 @@ import { extendTailwindMerge } from "tailwind-merge";
  * `tokens.css`.
  */
 /**
- * The custom-type-scale config for tailwind-merge. Exported so it can ALSO be
- * handed to `tailwind-variants` (`tv(..., { twMergeConfig })`) — tv runs its own
- * internal tailwind-merge with the DEFAULT config, which would otherwise collapse
- * a custom font-size (e.g. `text-caption`) together with a color (e.g.
- * `text-background`) and drop one of them. Keep both merges on the same config.
+ * The custom-type-scale config for tailwind-merge. Exported so the shared
+ * `tailwind-variants` factory in `./tv` can inject the SAME merger — tv's own
+ * default tables would otherwise collapse a custom font-size (e.g.
+ * `text-caption`) together with a color (e.g. `text-background`) and drop one of
+ * them. One config, one engine, everywhere.
  */
 export const twMergeConfig = {
 	extend: {
@@ -48,7 +48,12 @@ export const twMergeConfig = {
 	}
 };
 
-const twMerge = extendTailwindMerge(twMergeConfig);
+/**
+ * The single Tailwind conflict resolver for the system: `tailwind-merge`
+ * extended with the Dropout type scale. Exported so `tv()` (see `./tv`) runs the
+ * identical table as `cn()`.
+ */
+export const twMerge = extendTailwindMerge(twMergeConfig);
 
 /**
  * Merge class lists with Tailwind conflict resolution.

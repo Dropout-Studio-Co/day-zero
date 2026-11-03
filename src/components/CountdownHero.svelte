@@ -5,11 +5,11 @@
 	edit/share actions sit beneath, never out-shouting the digits.
 -->
 <script lang="ts">
-	import { formatTargetDate } from "$lib/countdown/format";
-	import { Heading } from "$lib/ds";
+	import { formatTargetDate } from "#lib/countdown/format.js";
+	import { Heading } from "#lib/ds/index.js";
 	import CountdownDisplay from "./CountdownDisplay.svelte";
 	import { Pencil, Share2 } from "@lucide/svelte";
-	import type { Countdown } from "$lib/types";
+	import type { Countdown } from "#lib/types.js";
 
 	let {
 		countdown,

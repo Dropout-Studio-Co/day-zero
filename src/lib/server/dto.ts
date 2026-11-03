@@ -3,7 +3,7 @@
  * client-facing domain types in $lib/types, serializing Date columns to ISO
  * strings (Date does not survive the load → client wire boundary).
  */
-import type { Countdown, PublicCountdown } from "$lib/types";
+import type { Countdown, PublicCountdown } from "#lib/types.js";
 import type { schema } from "./db";
 import type { InferSelectModel } from "drizzle-orm";
 

@@ -10,9 +10,9 @@
 <script lang="ts">
 	import { untrack, onMount } from "svelte";
 	import { enhance } from "$app/forms";
-	import { invalidateAll } from "$app/navigation";
+	import { refreshAll } from "$app/navigation";
 	import { ArrowLeft, RefreshCw, Fingerprint, Trash2, Cloud, Check } from "@lucide/svelte";
-	import { authClient } from "$lib/auth-client";
+	import { authClient } from "#lib/auth-client.js";
 	import {
 		Eyebrow,
 		Heading,
@@ -27,8 +27,8 @@
 		SettingsSection,
 		SettingsRow,
 		SettingsActions
-	} from "$lib/ds";
-	import { isPlatformAuthenticatorAvailable, detectPlatform, biometricLabel } from "$lib/ds/adapters";
+	} from "#lib/ds/index.js";
+	import { isPlatformAuthenticatorAvailable, detectPlatform, biometricLabel } from "#lib/ds/adapters/index.js";
 
 	let { data } = $props();
 
@@ -79,7 +79,7 @@
 		refreshing = true;
 		try {
 			await fetch("/api/cf/models?refresh=1");
-			await invalidateAll();
+			await refreshAll();
 		} finally {
 			refreshing = false;
 		}

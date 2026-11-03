@@ -5,8 +5,8 @@
  */
 import { error } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
-import { requireApiContext, ok } from "$lib/server/api";
-import { setShare } from "$lib/server/repositories/countdowns";
+import { requireApiContext, ok } from "#lib/server/api.js";
+import { setShare } from "#lib/server/repositories/countdowns.js";
 
 export const POST: RequestHandler = async (event) => {
 	const { db, userId } = requireApiContext(event);

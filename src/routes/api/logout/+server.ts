@@ -1,6 +1,7 @@
-import { json, redirect } from "@sveltejs/kit";
-import { createAuth } from "$lib/server/auth";
+import { redirect } from "@sveltejs/kit";
+import { createAuth } from "#lib/server/auth.js";
 import type { RequestHandler } from "./$types";
+import { env } from "cloudflare:workers";
 
 // Authoritative logout. Better Auth names its session cookie `${prefix}.session_token`; because
 // `session.cookieCache` is enabled it ALSO caches a signed session snapshot in a SEPARATE cookie
@@ -20,14 +21,14 @@ const clearSessionCookies = (cookies: Parameters<RequestHandler>[0]["cookies"]) 
 // Kill the server-side session row (best-effort). The cookie clearing below is what guarantees the
 // browser is logged out, so any failure here is swallowed — never 500 a logout.
 const killDbSession = async (event: Parameters<RequestHandler>[0]) => {
-	const db = event.platform?.env?.DB;
+	const db = env.DB;
 	if (!db) return;
 	try {
 		const auth = createAuth(db, {
-			BETTER_AUTH_SECRET: event.platform?.env?.BETTER_AUTH_SECRET ?? "",
-			BETTER_AUTH_URL: event.platform?.env?.BETTER_AUTH_URL ?? "http://localhost:5173",
-			GOOGLE_CLIENT_ID: event.platform?.env?.GOOGLE_CLIENT_ID ?? "",
-			GOOGLE_CLIENT_SECRET: event.platform?.env?.GOOGLE_CLIENT_SECRET ?? ""
+			BETTER_AUTH_SECRET: env.BETTER_AUTH_SECRET ?? "",
+			BETTER_AUTH_URL: env.BETTER_AUTH_URL ?? "http://localhost:5173",
+			GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID ?? "",
+			GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET ?? ""
 		});
 		await auth.api.signOut({ headers: event.request.headers });
 	} catch {
@@ -39,7 +40,7 @@ const killDbSession = async (event: Parameters<RequestHandler>[0]) => {
 export const POST: RequestHandler = async (event) => {
 	await killDbSession(event);
 	clearSessionCookies(event.cookies);
-	return json({ success: true });
+	return Response.json({ success: true });
 };
 
 export const GET: RequestHandler = async (event) => {

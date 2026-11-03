@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Countdown } from "$lib/types";
+import type { Countdown } from "#lib/types.js";
 import { applyOrder, orderByPosition, partitionCountdowns } from "./partition";
 
 const NOW = Date.UTC(2026, 8, 1, 12, 0, 0);

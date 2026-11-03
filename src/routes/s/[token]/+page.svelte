@@ -10,10 +10,10 @@
 	import { onMount } from "svelte";
 	import { fade } from "svelte/transition";
 	import { Maximize, Minimize } from "@lucide/svelte";
-	import { clock } from "$lib/stores/clock.svelte";
-	import { prefersReducedMotion } from "$lib/motion";
-	import { Heading, Cta } from "$lib/ds";
-	import { formatTargetDate, humanize } from "$lib/countdown/format";
+	import { clock } from "#lib/stores/clock.svelte.js";
+	import { prefersReducedMotion } from "#lib/motion/index.js";
+	import { Heading, Cta } from "#lib/ds/index.js";
+	import { formatTargetDate, humanize } from "#lib/countdown/format.js";
 	import CountdownDisplay from "$src/components/CountdownDisplay.svelte";
 	import type { PageData } from "./$types";
 
