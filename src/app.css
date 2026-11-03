@@ -4,7 +4,7 @@
  * Color / type / space / motion-ease tokens come from @dropout/ds — the single
  * source of visual truth. DS tokens.css supplies the ink ramp, semantic aliases,
  * the editorial layer (signal / ink-muted / hair), the type scale, fonts, radius,
- * shadows, --ease, the shell vars, the @custom-variant set, and the base layer.
+ * shadows, --ease-standard, the shell vars, the @custom-variant set, and the base layer.
  * DS is VENDORED at src/lib/ds (run `bun run sync-ds` to refresh from the DS
  * repo). Tailwind v4 auto-scans src/, so the DS component classes (bg-signal,
  * border-hair, …) are generated with no `@source` needed.
@@ -32,6 +32,12 @@
 	/* shadcn popover surface → DS card */
 	--popover: var(--card);
 	--popover-foreground: var(--card-foreground);
+
+	/* The DS renamed its shared easing role to --ease-standard, but app components
+	   (and the countdown tick keyframes) still ask for --ease. Without this alias the
+	   timing function is invalid at computed-value time, so those transitions and the
+	   tick animation silently fall back to the browser default. */
+	--ease: var(--ease-standard);
 
 	/* a touch stronger than the DS hairline; legacy accent → signal (monochrome) */
 	--border-strong: var(--color-ink-600);

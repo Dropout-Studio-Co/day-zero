@@ -1,6 +1,7 @@
 // SvelteKit config. Deploys to Cloudflare Workers via adapter-cloudflare; platformProxy
-// (below) binds `event.platform.env` — DB, AI, VECTORIZE, AI_QUOTA_KV — to wrangler.jsonc
-// during dev/preview so server code sees the same bindings it gets in production.
+// (below) emulates the `cloudflare:workers` module — `env` (DB, AI, AI_QUOTA_KV, vars and
+// secrets) — from wrangler.jsonc during dev/preview, so server code sees the same bindings
+// it gets in production.
 import adapter from "@sveltejs/adapter-cloudflare";
 import { fileURLToPath } from "node:url";
 
