@@ -184,13 +184,17 @@ export const handle: Handle = async ({ event, resolve }) => {
  */
 export const handleError: HandleServerError = async ({ kind, error, event }) => {
 	const errorId = crypto.randomUUID();
+	const status =
+		kind === "framework" || kind === "validation"
+			? (error as { status?: number }).status
+			: undefined;
+	const safeMessage = (error as { message?: string }).message ?? "An unexpected error occurred";
 	const message =
-		kind === "unknown"
-			? "An unexpected error occurred"
-			: ((error as { message?: string }).message ?? "An unexpected error occurred");
+		kind === "unknown" || (status ?? 0) >= 500 ? "An unexpected error occurred" : safeMessage;
 
 	console.error(`[${errorId}] Unhandled error:`, {
 		kind,
+		status,
 		message,
 		url: event.url.pathname,
 		method: event.request.method,

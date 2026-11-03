@@ -10,12 +10,12 @@ import type { HandleClientError } from "@sveltejs/kit/hooks";
  */
 export const handleError: HandleClientError = async ({ kind, error }) => {
 	const errorId = crypto.randomUUID();
+	const status = kind === "framework" ? (error as { status?: number }).status : undefined;
+	const safeMessage = (error as { message?: string }).message ?? "An unexpected error occurred";
 	const message =
-		kind === "unknown"
-			? "An unexpected error occurred"
-			: ((error as { message?: string }).message ?? "An unexpected error occurred");
+		kind === "unknown" || (status ?? 0) >= 500 ? "An unexpected error occurred" : safeMessage;
 
-	console.error(`[${errorId}] Client error:`, { kind, message, error });
+	console.error(`[${errorId}] Client error:`, { kind, status, message, error });
 
 	return { message, errorId };
 };
