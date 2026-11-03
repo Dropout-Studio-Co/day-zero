@@ -44,7 +44,10 @@ export default defineConfig({
 			},
 
 			adapter: adapter({
-				platformProxy: { configPath: "wrangler.jsonc" },
+				// Local emulation only. The remote variants need a Cloudflare login, which CI and
+				// `vitest` (it boots this plugin) do not have, and the Copilot's inference is the
+				// user's own REST account rather than the bound AI namespace anyway.
+				platformProxy: { configPath: "wrangler.jsonc", remoteBindings: false },
 				routes: { include: ["/*"], exclude: ["<all>"] }
 			})
 		})
