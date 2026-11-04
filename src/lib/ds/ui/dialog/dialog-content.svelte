@@ -2,7 +2,7 @@
 	import { Dialog as DialogPrimitive } from "bits-ui";
 	import XIcon from "@lucide/svelte/icons/x";
 	import { Button } from "../button/index.js";
-	import { cn, type WithoutChildrenOrChild } from "../../utils";
+	import { cn, revealFocusedElement, type WithoutChildrenOrChild } from "../../utils";
 	import * as Dialog from "./index.js";
 	import DialogPortal from "./dialog-portal.svelte";
 	import type { Snippet } from "svelte";
@@ -34,8 +34,8 @@
 			className
 		)}
 		{...restProps}
+		onfocusin={revealFocusedElement}
 	>
-		{@render children?.()}
 		{#if showCloseButton}
 			<DialogPrimitive.Close data-slot="dialog-close">
 				{#snippet child({ props })}
@@ -52,5 +52,6 @@
 				{/snippet}
 			</DialogPrimitive.Close>
 		{/if}
+		{@render children?.()}
 	</DialogPrimitive.Content>
 </DialogPortal>

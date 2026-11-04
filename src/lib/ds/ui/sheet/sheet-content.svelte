@@ -6,7 +6,7 @@
 	import { Dialog as SheetPrimitive } from "bits-ui";
 	import XIcon from "@lucide/svelte/icons/x";
 	import { Button } from "../button/index.js";
-	import { cn, type WithoutChildrenOrChild } from "../../utils";
+	import { cn, revealFocusedElement, type WithoutChildrenOrChild } from "../../utils";
 	import SheetOverlay from "./sheet-overlay.svelte";
 	import SheetPortal from "./sheet-portal.svelte";
 	import type { Snippet } from "svelte";
@@ -41,8 +41,8 @@
 			className
 		)}
 		{...restProps}
+		onfocusin={revealFocusedElement}
 	>
-		{@render children?.()}
 		{#if showCloseButton}
 			<SheetPrimitive.Close data-slot="sheet-close">
 				{#snippet child({ props })}
@@ -59,5 +59,6 @@
 				{/snippet}
 			</SheetPrimitive.Close>
 		{/if}
+		{@render children?.()}
 	</SheetPrimitive.Content>
 </SheetPortal>

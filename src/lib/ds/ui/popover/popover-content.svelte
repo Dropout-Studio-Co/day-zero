@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Popover as PopoverPrimitive } from "bits-ui";
-	import { cn, type WithoutChildrenOrChild } from "../../utils";
+	import { cn, revealFocusedElement, type WithoutChildrenOrChild } from "../../utils";
 	import PopoverPortal from "./popover-portal.svelte";
 	import type { ComponentProps } from "svelte";
 
@@ -27,5 +27,6 @@
 			className
 		)}
 		{...restProps}
+		onfocusin={revealFocusedElement}
 	/>
 </PopoverPortal>

@@ -61,6 +61,12 @@ export const twMerge = extendTailwindMerge(twMergeConfig);
  */
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
+/** Keep keyboard focus inside a scrollable overlay visible without moving the page. */
+export const revealFocusedElement = (event: FocusEvent) => {
+	const target = event.target;
+	if (target instanceof HTMLElement) target.scrollIntoView({ block: "nearest", inline: "nearest" });
+};
+
 export type WithoutChild<T> = T extends { child?: unknown } ? Omit<T, "child"> : T;
 export type WithoutChildren<T> = T extends { children?: unknown } ? Omit<T, "children"> : T;
 export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;

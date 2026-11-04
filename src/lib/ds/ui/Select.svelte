@@ -79,6 +79,7 @@
 	let nativeItems = $state<SelectItem[]>([]);
 	const resolvedItems = $derived(items ?? nativeItems);
 	const selectedLabel = $derived(resolvedItems.find(item => item.value === value)?.label ?? "");
+	const triggerLabel = $derived(ariaLabel ? `${ariaLabel}: ${selectedLabel || placeholder}` : undefined);
 
 	const syncNativeItems = () => {
 		if (!nativeSelect) return;
@@ -151,7 +152,7 @@
 			id={publicId}
 			onpointerdown={rememberActivation}
 			onclick={reconcileActivation}
-			aria-label={ariaLabel}
+			aria-label={triggerLabel}
 			aria-labelledby={ariaLabelledby}
 			aria-describedby={controlDescribedby}
 			aria-invalid={controlInvalid}
