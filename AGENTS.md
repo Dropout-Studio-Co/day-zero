@@ -36,7 +36,7 @@ bun run lint              # eslint
 bun run format            # prettier --write
 bun run test              # vitest unit tests (pure logic only: no DOM, network, or D1)
 bun run test:watch        # vitest in watch mode
-bun run sync-ds           # re-vendor @dropout/ds from ../../dropout-design-system (rsync --delete)
+bun run sync-ds           # re-vendor @dropout/ds from the canonical DS inventory (dropout-ds-sync)
 bun run db:generate       # generate Drizzle migration from schema
 bun run db:migrate        # apply migrations to REMOTE D1 (production)
 bun run db:migrate:local  # apply migrations to local D1 (dev/preview)
