@@ -68,18 +68,18 @@
 	const controlDisabled = $derived(disabled ?? fieldProps?.disabled ?? false);
 	const controlDescribedby = $derived(mergeDescribedBy(fieldProps?.["aria-describedby"], ariaDescribedby));
 	const controlInvalid = $derived(ariaInvalid ?? fieldProps?.["aria-invalid"]);
-	const triggerLabel = $derived(
-		ariaLabel ?? (open ? closeLabel : openLabel) ?? label ?? (open ? "Close options" : "Open options")
-	);
-	let searchValue = $state("");
-	const filteredItems = $derived(
-		searchValue ? items.filter(item => item.label.toLowerCase().includes(searchValue.toLowerCase())) : items
-	);
 	const selectedLabels = $derived(
 		items
 			.filter(item => value.includes(item.value))
 			.map(item => item.label)
 			.join(", ")
+	);
+	const triggerLabel = $derived(
+		ariaLabel ?? (open ? closeLabel : openLabel) ?? (label ? undefined : open ? "Close options" : "Open options")
+	);
+	let searchValue = $state("");
+	const filteredItems = $derived(
+		searchValue ? items.filter(item => item.label.toLowerCase().includes(searchValue.toLowerCase())) : items
 	);
 	const handleInput = (event: Event & { currentTarget: HTMLInputElement }) => {
 		searchValue = event.currentTarget.value;
