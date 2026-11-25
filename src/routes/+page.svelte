@@ -101,8 +101,9 @@
 		<div class="flex flex-col items-center gap-8" use:reveal>
 			<Heading />
 			{#if !isEmpty}
-				<Cta variant="primary" arrow={false} dot onclick={openNew} class="touch-manipulation">new countdown</Cta
-				>
+				<Cta variant="primary" arrow={false} dot onclick={openNew} class="touch-manipulation">
+					new countdown
+				</Cta>
 			{/if}
 		</div>
 
